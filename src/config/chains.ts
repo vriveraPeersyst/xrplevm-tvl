@@ -7,7 +7,7 @@ export const CHAINS: ChainConfig[] = [
     displayName: 'XRPL EVM Testnet',
     denom: 'axrp',
     endpoints: {
-      testnet: '/api/xrplEvm',
+      testnet: '/api/xrplEvmTestnet',
       mainnet: '',
     },
   },
@@ -16,7 +16,7 @@ export const CHAINS: ChainConfig[] = [
     displayName: 'Elys Network Testnet',
     denom: 'ibc/E925EC46A2F4B84815DB7218ADF272989DADD18372C779F68DB31A6BC4F91B7D',
     endpoints: {
-      testnet: '/api/elys',
+      testnet: '/api/elysNetworkTestnet',
       mainnet: '',
     },
   },
@@ -25,7 +25,7 @@ export const CHAINS: ChainConfig[] = [
     displayName: 'Injective Testnet',
     denom: 'ibc/F9EEDC0E75CD67E8A72314B287BE7A221C365DE0F3D19D3E3272F07332ED8C1E',
     endpoints: {
-      testnet: '/api/injective',
+      testnet: '/api/injectiveTestnet',
       mainnet: '',
     },
   },
@@ -34,7 +34,7 @@ export const CHAINS: ChainConfig[] = [
     displayName: 'Osmosis Testnet',
     denom: 'ibc/24F3F83587084430E25E268A143565FEF5C84AE2308F2657BC46D1F227D2AF65',
     endpoints: {
-      testnet: '/api/osmosis',
+      testnet: '/api/osmosisTestnet',
       mainnet: '',
     },
   },
@@ -43,7 +43,7 @@ export const CHAINS: ChainConfig[] = [
     displayName: 'Cosmos Provider Hub',
     denom: 'ibc/68D1062C8B0F11B913FD9285553A7529C3C26D0C49FB64D135E255D9742F6A01',
     endpoints: {
-      testnet: '/api/cosmos',
+      testnet: '/api/cosmosProviderHub',
       mainnet: '',
     },
   },

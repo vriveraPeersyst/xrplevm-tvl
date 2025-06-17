@@ -7,31 +7,31 @@ export default defineConfig({
   server: {
     proxy: {
       // XRPL-EVM Testnet
-      '/api/xrplEvm': {
+      '/api/xrplEvmTestnet': {
         target: 'http://cosmos.testnet.xrplevm.org:1317',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/xrplEvm/, ''),
       },
       // Elys Testnet
-      '/api/elys': {
+      '/api/elysNetworkTestnet': {
         target: 'https://elys-testnet-api.itrocket.net',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/elys/, ''),
       },
       // Injective Testnet
-      '/api/injective': {
+      '/api/injectiveTestnet': {
         target: 'https://injective-testnet-rest.publicnode.com',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/injective/, ''),
       },
       // Osmosis Testnet
-      '/api/osmosis': {
+      '/api/osmosisTestnet': {
         target: 'https://lcd.osmotest5.osmosis.zone/',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/osmosis/, ''),
       },
       // Osmosis Testnet
-      '/api/cosmos': {
+      '/api/cosmosProviderHub': {
         target: 'https://cosmos-testnet-api.itrocket.net',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/cosmos/, ''),
