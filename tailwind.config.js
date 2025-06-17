@@ -13,6 +13,9 @@ export default {
         black:       '#000000',
         white:       '#FFFFFF',
       },
+      fontFamily: {
+        work: ['Work Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],
