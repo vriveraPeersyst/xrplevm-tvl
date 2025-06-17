@@ -7,7 +7,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black font-work">
       <header className="bg-darkPurple text-white p-6 flex flex-col items-center">
-        <h1 className="text-3xl font-bold tracking-tight">XRP Supply Monitor</h1>
+        <img
+          src="/src/assets/XRPLEVM_FullWhiteLogo.png"
+          alt="XRPL EVM Logo"
+          className="mx-auto h-12 md:h-16"
+          style={{ objectFit: 'contain' }}
+        />
       </header>
       <Dashboard env={env} onEnvChange={setEnv} />
     </div>

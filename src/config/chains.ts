@@ -38,4 +38,13 @@ export const CHAINS: ChainConfig[] = [
       mainnet: '',
     },
   },
+  {
+    key: 'cosmos',
+    displayName: 'Cosmos Hub',
+    denom: 'ibc/68D1062C8B0F11B913FD9285553A7529C3C26D0C49FB64D135E255D9742F6A01',
+    endpoints: {
+      testnet: '/api/cosmos',
+      mainnet: '',
+    },
+  },
 ];

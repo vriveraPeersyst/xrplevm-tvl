@@ -26,9 +26,15 @@ export default defineConfig({
       },
       // Osmosis Testnet
       '/api/osmosis': {
-        target: 'https://lcd.osmosis.zone/',
+        target: 'https://lcd.osmotest5.osmosis.zone/',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/osmosis/, ''),
+      },
+      // Osmosis Testnet
+      '/api/cosmos': {
+        target: 'https://cosmos-testnet-api.itrocket.net',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/cosmos/, ''),
       },
     },
   },

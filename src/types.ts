@@ -1,5 +1,5 @@
 export type Env = 'testnet' | 'mainnet';
-export type ChainKey = 'xrplEvm' | 'elys' | 'injective' | 'osmosis';
+export type ChainKey = 'xrplEvm' | 'elys' | 'injective' | 'osmosis' | 'cosmos';
 
 /**
  * Configuration for each supported chain.

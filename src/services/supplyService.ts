@@ -36,6 +36,10 @@ export async function fetchTotalSupply(
   let payload: { amount?: { amount: string } };
   try {
     payload = await res.json();
+    // Debug: log the response for cosmos and osmosis
+    if (chain.key === 'cosmos' || chain.key === 'osmosis') {
+      console.log(`[DEBUG] ${chain.key} response:`, payload);
+    }
   } catch (err) {
     const text = await res.text();
     throw new Error(`Invalid JSON from ${chain.key}: ${text.substring(0, 100)}`);

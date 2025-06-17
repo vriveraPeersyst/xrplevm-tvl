@@ -47,7 +47,7 @@ export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
                   {loading
                     ? <span className="text-lightPurple animate-pulse">Loading…</span>
                     : data[chain.key]?.error
-                      ? <span className="text-red-400">{data[chain.key]?.error}</span>
+                      ? <span className="text-red-400">api failed</span>
                       : <span className="text-green font-mono text-xl">{data[chain.key]?.amount ?? '0'}</span>
                   }
                 </td>
