@@ -1,0 +1,38 @@
+{
+  "name": "xrp-dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "gen:proto": "protoc \\\n  -I=proto \\\n  -I=proto/deps/cosmos-sdk/proto \\\n  proto/cosmos/bank/v1beta1/query.proto \\\n  --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \\\n  --ts_proto_out=src/proto \\\n  --ts_proto_opt=esModuleInterop=true,outputServices=grpc-web"
+  },
+  "dependencies": {
+    "@improbable-eng/grpc-web": "^0.15.0",
+    "google-protobuf": "^3.21.4",
+    "grpc-web": "^1.5.0",
+    "postcss": "^8.5.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.10",
+    "autoprefixer": "^10.4.21"
+  },
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "^2.5.2",
+    "@eslint/js": "^9.25.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "ts-proto": "^2.7.5",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^6.3.5"
+  }
+}
