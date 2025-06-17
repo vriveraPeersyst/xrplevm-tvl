@@ -11,7 +11,7 @@ export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
 
   return (
     <div className="max-w-2xl mx-auto mt-16 flex flex-col items-center font-work">
-      <h2 className="text-4xl font-bold text-lightPurple mb-4 text-center tracking-tight">
+      <h2 className="text-4xl font-bold text-lightPurple mb-10 text-center tracking-tight">
         XRP Total Supply on IBC
       </h2>
       <div className="mb-8">
@@ -21,10 +21,10 @@ export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
         <table className="min-w-full">
           <thead>
             <tr>
-              <th className="px-8 py-5 text-left text-lightPurple text-xl font-semibold bg-darkPurple/95">
+              <th className="px-8 py-5 text-center text-lightPurple text-xl font-semibold bg-darkPurple/95">
                 Chain
               </th>
-              <th className="px-8 py-5 text-left text-lightPurple text-xl font-semibold bg-darkPurple/95">
+              <th className="px-8 py-5 text-center text-lightPurple text-xl font-semibold bg-darkPurple/95">
                 Balance
               </th>
             </tr>
@@ -42,8 +42,8 @@ export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
                   background: idx % 2 === 0 ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.04)'
                 }}
               >
-                <td className="px-8 py-6 text-white font-medium text-lg">{chain.displayName}</td>
-                <td className="px-8 py-6">
+                <td className="px-8 py-6 text-white font-medium text-lg text-center">{chain.displayName}</td>
+                <td className="px-8 py-6 text-center">
                   {loading
                     ? <span className="text-lightPurple animate-pulse">Loading…</span>
                     : data[chain.key]?.error
