@@ -3,7 +3,7 @@ import type { ChainConfig } from '../types';
 /** List of supported chains with their settings */
 export const CHAINS: ChainConfig[] = [
   {
-    key: 'xrplEvm',
+    key: 'xrplEvmTestnet',
     displayName: 'XRPL EVM Testnet',
     denom: 'axrp',
     endpoints: {
@@ -12,7 +12,7 @@ export const CHAINS: ChainConfig[] = [
     },
   },
   {
-    key: 'elys',
+    key: 'elysNetworkTestnet',
     displayName: 'Elys Network Testnet',
     denom: 'ibc/E925EC46A2F4B84815DB7218ADF272989DADD18372C779F68DB31A6BC4F91B7D',
     endpoints: {
@@ -21,7 +21,7 @@ export const CHAINS: ChainConfig[] = [
     },
   },
   {
-    key: 'injective',
+    key: 'injectiveTestnet',
     displayName: 'Injective Testnet',
     denom: 'ibc/F9EEDC0E75CD67E8A72314B287BE7A221C365DE0F3D19D3E3272F07332ED8C1E',
     endpoints: {
@@ -30,7 +30,7 @@ export const CHAINS: ChainConfig[] = [
     },
   },
   {
-    key: 'osmosis',
+    key: 'osmosisTestnet',
     displayName: 'Osmosis Testnet',
     denom: 'ibc/24F3F83587084430E25E268A143565FEF5C84AE2308F2657BC46D1F227D2AF65',
     endpoints: {
@@ -39,7 +39,7 @@ export const CHAINS: ChainConfig[] = [
     },
   },
   {
-    key: 'cosmos',
+    key: 'cosmosProviderHub',
     displayName: 'Cosmos Provider Hub',
     denom: 'ibc/68D1062C8B0F11B913FD9285553A7529C3C26D0C49FB64D135E255D9742F6A01',
     endpoints: {
