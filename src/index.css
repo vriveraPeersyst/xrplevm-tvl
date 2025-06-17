@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  /* your global resets */
   body {
-    background-color: #FFFFFF;
-    color: #000000;
+    background-color: #000;
+    color: #fff;
   }
 }

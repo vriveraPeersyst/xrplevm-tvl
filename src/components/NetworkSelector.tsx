@@ -13,8 +13,8 @@ export const NetworkSelector: React.FC<Props> = ({ env, onChange }) => (
         onClick={() => onChange(e)}
         className={`px-4 py-2 rounded-full font-semibold
           ${env===e
-            ? 'bg-lightPurple text-white shadow-lg'
-            : 'bg-white text-darkPurple border border-darkPurple'
+            ? 'bg-lightPurple text-black shadow-lg'
+            : 'bg-black text-lightPurple border border-lightPurple'
           }`}
       >
         {e.toUpperCase()}
