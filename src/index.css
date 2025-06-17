@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* custom overrides */
-body {
-  background-color: theme('colors.white');
-  color: theme('colors.black');
+@layer base {
+  body {
+    background-color: #FFFFFF;
+    color: #000000;
+  }
 }
