@@ -15,7 +15,7 @@ export const SupplyCard: React.FC<Props> = ({ chainName, amount, error, loading 
     ) : error ? (
       <p className="text-red-400 mt-2">{error}</p>
     ) : (
-      <p className="text-2xl mt-4 font-mono text-green">{amount ?? '0'}</p>
+      <p className="text-2xl mt-4 font-mono text-green">{amount ?? '0.00'}</p>
     )}
   </div>
 );

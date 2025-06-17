@@ -6,10 +6,9 @@ import type { Env, ChainConfig } from '../types';
  * Formats a big integer string into a decimal string with the given precision.
  */
 function formatUnits(amount: string, decimals: number): string {
-  const padded = amount.padStart(decimals + 1, '0');
-  const integer = padded.slice(0, -decimals);
-  const fraction = padded.slice(-decimals).replace(/0+$/, '');
-  return fraction ? `${integer}.${fraction}` : integer;
+  // Convert to number, divide by 10^decimals, and fix to 2 decimals
+  const n = Number(amount) / 10 ** decimals;
+  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 /**
