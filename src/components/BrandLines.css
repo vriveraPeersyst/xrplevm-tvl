@@ -1,0 +1,44 @@
+/* Base style for both stripes */
+.brand-line {
+  position: fixed;
+  z-index: 9;
+  pointer-events: none;
+  width: 1000px;
+  height: 1000px;
+  opacity: 0.7;
+}
+
+/* Left stripe: rotated, purple‐gradient */
+.brand-line--left {
+  top: auto;
+  bottom: -10px;
+  left: -500px;
+  background: none;
+}
+
+/* Right stripe: rotated, green‐gradient */
+.brand-line--right {
+  top: -10px;
+  right: -500px;
+  background: none;
+}
+
+.App {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .brand-line {
+    width: 700px;
+    height: 700px;
+  }
+  .brand-line--left {
+    left: -500px;
+    bottom: -200px;
+  }
+  .brand-line--right {
+    right: -500px;
+    top: -10px;
+  }
+}
