@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CHAINS } from '../config/chains';
 import { useTotalSupply } from '../hooks/useTotalSupply';
 import { NetworkSelector } from './NetworkSelector';
@@ -7,7 +7,13 @@ import type { Env } from '../types';
 interface Props { env: Env; onEnvChange: (env: Env) => void; }
 
 export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
-  const { data, loading } = useTotalSupply(env, CHAINS);
+  // Only show chains for the selected network
+  const visibleChains = useMemo(
+    () => CHAINS.filter(c => c.network === env),
+    [env],
+  );
+
+  const { data, loading } = useTotalSupply(env, visibleChains);
 
   return (
     <div className="max-w-2xl mx-auto mt-16 flex flex-col items-center font-work">
@@ -30,11 +36,11 @@ export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
             </tr>
           </thead>
           <tbody>
-            {CHAINS.map((chain, idx) => (
+            {visibleChains.map((chain, idx) => (
               <tr
                 key={chain.key}
                 className={
-                  idx === CHAINS.length - 1
+                  idx === visibleChains.length - 1
                     ? ''
                     : 'border-b border-black/30'
                 }

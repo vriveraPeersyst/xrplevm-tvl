@@ -11,6 +11,8 @@ export interface ChainConfig {
   displayName: string;
   /** IBC denomination or native denom */
   denom: string;
+  /** Which network this chain supports */
+  network: Env;
   /** REST endpoints for testnet and mainnet */
   endpoints: {
     testnet: string;

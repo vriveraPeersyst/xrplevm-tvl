@@ -13,8 +13,8 @@ export const NetworkSelector: React.FC<Props> = ({ env, onChange }) => (
         onClick={() => onChange(e)}
         className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-150
           ${env===e
-            ? 'bg-lightPurple text-gray-400 shadow-md'
-            : 'bg-transparent text-lightPurple hover:bg-lightPurple/20'
+            ? 'bg-lightPurple text-lightPurple shadow-md'
+            : 'bg-transparent text-gray-400 hover:bg-lightPurple/20'
           }`}
         style={{
           boxShadow: env===e ? '0 2px 12px 0 rgba(200,144,255,0.15)' : undefined,
