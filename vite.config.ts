@@ -70,7 +70,7 @@ export default defineConfig({
       '/api/noble': {
         target: 'https://noble-api.polkachu.com',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api\/cosmosHub/, ''),
+        rewrite: path => path.replace(/^\/api\/noble/, ''),
       },
     },
   },
