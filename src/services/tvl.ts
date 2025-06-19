@@ -35,11 +35,11 @@ export async function loadRows():Promise<Row[]>{
   const {usd:xrpUsd}=await priceAndLogo('ripple'); // Only get price, ignore logo
   const xrpRows=await Promise.all(CHAINS.map(async c=>{
     const raw=await cosmosSupply(c.endpoint,c.denom);
-    const q=Number(raw)/10**6;
+    const q=Number(raw)/10**18;
     return {
       key:`xrp-${c.key}`,
       symbol:'XRP',
-      decimals:6,
+      decimals:18,
       source:'XRPL',
       dest: c.name as Destination,
       denom:c.denom,
