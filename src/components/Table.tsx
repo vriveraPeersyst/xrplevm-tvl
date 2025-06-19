@@ -18,11 +18,27 @@ export const Table = ({ rows, loading }: { rows: Row[], loading: boolean }) => (
         {loading ? (
           <tr><td colSpan={6} className="py-6 text-center"><span className="animate-pulse text-lightPurple">Loading…</span></td></tr>
         ) : rows.map(r => (
-          <tr key={r.key} className="border-b border-black/30 even:bg-black/10 text-center">
+          <tr
+            key={r.key}
+            className="border-b border-black/30 even:bg-black/10 text-center group cursor-pointer transition-all duration-200"
+            style={{ position: 'relative', zIndex: 0, transitionProperty: 'box-shadow, transform, background-color', willChange: 'transform, box-shadow' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.zIndex = '20';
+              e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(200,144,255,0.25), 0 1.5px 8px 0 rgba(50,230,133,0.10)';
+              e.currentTarget.style.transform = 'scale(1.025)';
+              e.currentTarget.style.background = 'rgba(200,144,255,0.10)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.zIndex = '0';
+              e.currentTarget.style.boxShadow = '';
+              e.currentTarget.style.transform = '';
+              e.currentTarget.style.background = '';
+            }}
+          >
             <td className="py-3 px-2 text-center align-middle"><Avatar src={r.logo} /></td>
             <td className="py-3 px-6 font-semibold align-middle">{r.symbol}</td>
-            <td className="py-3 px-6 align-middle">{r.source}</td>
-            <td className="py-3 px-6 align-middle">{r.dest}</td>
+            <td className="py-3 px-2 align-middle">{r.source}</td>
+            <td className="py-3 px-2 align-middle">{r.dest}</td>
             <td className="py-3 px-6 font-mono align-middle">{r.quantity.toLocaleString()}</td>
             <td className="py-3 px-6 font-mono text-green align-middle">
               {r.valueUsd.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 })}

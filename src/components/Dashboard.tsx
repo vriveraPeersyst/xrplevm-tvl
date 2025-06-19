@@ -21,22 +21,31 @@ function Dashboard() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto py-10 font-work text-white px-4">
-      <h2 className="text-center text-4xl font-extrabold text-lightPurple mb-2">
+    <div className="max-w-5xl mx-auto py-5 font-work text-white px-1 text-base md:text-lg">
+      <h2 className="text-center text-2xl md:text-4xl font-extrabold text-lightPurple mb-8 md:mb-10">
         XRPL EVM ecosystem TVL
       </h2>
-      <p className="text-center text-green text-3xl mb-8">
-        {loading
-          ? 'Loading…'
-          : total.toLocaleString(undefined, {
-              style: 'currency',
-              currency: 'USD',
-              maximumFractionDigits: 0,
-            })}
+      <p className="text-center text-green text-3xl md:text-5xl mb-6 md:mb-8 min-h-[3.5rem] flex items-center justify-center">
+        {loading ? (
+          <span
+            className="inline-block animate-spin mr-2 align-middle"
+            style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              border: '2px solid #32E685',
+              borderTop: '4px solid transparent',
+              borderRadius: '50%',
+            }}
+          ></span>
+        ) : (
+          '$' + total.toLocaleString(undefined, {
+            maximumFractionDigits: 0,
+          })
+        )}
       </p>
 
       {/* filters */}
-      <div className="flex gap-4 flex-wrap justify-center mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 justify-center mb-4 md:mb-6 text-sm md:text-base min-w-xl mx-auto">
         <Filters
           label="Source"
           value={src}
@@ -56,8 +65,11 @@ function Dashboard() {
           opts={['all', ...new Set(rows.map(r => r.symbol))]}
         />
       </div>
-
-      <Table rows={list} loading={loading} />
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[350px]">
+          <Table rows={list} loading={loading} />
+        </div>
+      </div>
     </div>
   );
 }

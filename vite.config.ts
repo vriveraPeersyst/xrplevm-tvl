@@ -48,6 +48,18 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/coingecko/, ''),
       },
+      // CoinMarketCap (requires VITE_CMC_API_KEY in .env)
+      '/api/cmc': {
+        target: 'https://pro-api.coinmarketcap.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/cmc/, ''),
+      },
+      // Binance
+      '/api/binance': {
+        target: 'https://api.binance.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/binance/, ''),
+      },
     },
   },
 })

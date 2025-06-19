@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { Env, ChainConfig } from '../types';
-import { fetchTotalSupply } from '../services/supplyService';
 
 interface SupplyState {
   [key: string]: {
@@ -11,10 +9,15 @@ interface SupplyState {
 
 /**
  * Custom hook to load total supply for a list of chains.
+ *
+ * @param env - environment/config object (any type)
+ * @param chains - array of chain config objects (any type)
+ * @param fetchTotalSupply - function to fetch total supply for a chain
  */
 export function useTotalSupply(
-  env: Env,
-  chains: ChainConfig[],
+  env: any,
+  chains: any[],
+  fetchTotalSupply: (env: any, chain: any) => Promise<string>
 ): { loading: boolean; data: SupplyState } {
   const [data, setData] = useState<SupplyState>({});
   const [loading, setLoading] = useState(true);
@@ -38,7 +41,7 @@ export function useTotalSupply(
       setData(next);
       setLoading(false);
     });
-  }, [env, chains]);
+  }, [env, chains, fetchTotalSupply]);
 
   return { loading, data };
 }
