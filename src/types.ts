@@ -1,21 +1,25 @@
-export type Env = 'testnet' | 'mainnet';
-export type ChainKey = 'xrplEvmTestnet' | 'elysNetworkTestnet' | 'injectiveTestnet' | 'osmosisTestnet' | 'cosmosProviderHub' | 'xrplEvm' | 'elysNetwork' | 'injective' | 'osmosis' | 'cosmosHub' | 'noble';
+export type Source =
+  | 'XRPL' | 'Ethereum' | 'Osmosis' | 'Elys' | 'Injective'
+  | 'Noble' | 'Cosmos Hub' | 'BSC' | 'Solana' | 'Sui';
 
-/**
- * Configuration for each supported chain.
- */
-export interface ChainConfig {
-  /** Unique chain key */
-  key: ChainKey;
-  /** Human‐readable name */
-  displayName: string;
-  /** IBC denomination or native denom */
-  denom: string;
-  /** Which network this chain supports */
-  network: Env;
-  /** REST endpoints for testnet and mainnet */
-  endpoints: {
-    testnet: string;
-    mainnet: string;
-  };
+export type Destination =
+  | 'XRPL EVM' | 'Osmosis' | 'Elys Network'
+  | 'Injective' | 'Cosmos Hub' | 'Noble';
+
+export interface AssetStatic {
+  key: string;
+  symbol: string;
+  decimals: number;
+  source: Source;
+  dest: Destination;
+  address?: string;      // contracts on XRPL-EVM
+  denom?: string;        // axrp on Cosmos
+  cg: string;            // Coingecko id
+}
+
+export interface Row extends AssetStatic {
+  logo: string;          // token icon
+  chainLogo: string;     // destination badge
+  quantity: number;
+  valueUsd: number;
 }

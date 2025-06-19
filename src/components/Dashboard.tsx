@@ -1,67 +1,76 @@
-import React, { useMemo } from 'react';
-import { CHAINS } from '../config/chains';
-import { useTotalSupply } from '../hooks/useTotalSupply';
-import { NetworkSelector } from './NetworkSelector';
-import type { Env } from '../types';
+import { useMemo, useState } from 'react';
+import { useRows } from '../hooks/useRows';
+import { Filters } from './Filters';
+import { Table } from './Table';
 
-interface Props { env: Env; onEnvChange: (env: Env) => void; }
+function Dashboard() {
+  const { rows, total, loading } = useRows();
+  const [src, setSrc] = useState('all');
+  const [dst, setDst] = useState('all');
+  const [sym, setSym] = useState('all');
 
-export const Dashboard: React.FC<Props> = ({ env, onEnvChange }) => {
-  // Only show chains for the selected network
-  const visibleChains = useMemo(
-    () => CHAINS.filter(c => c.network === env),
-    [env],
+  const list = useMemo(
+    () =>
+      rows.filter(
+        r =>
+          (src === 'all' || r.source === src) &&
+          (dst === 'all' || r.dest === dst) &&
+          (sym === 'all' || r.symbol === sym),
+      ),
+    [rows, src, dst, sym],
   );
 
-  const { data, loading } = useTotalSupply(env, visibleChains);
-
   return (
-    <div className="max-w-2xl mx-auto mt-16 flex flex-col items-center font-work">
-      <h2 className="text-3xl sm:text-4xl font-bold text-lightPurple mb-6 sm:mb-10 text-center tracking-tight">
-        XRP Total Supply on IBC
+    <div className="max-w-5xl mx-auto py-5 font-work text-white px-1 text-base md:text-lg">
+      <h2 className="text-center text-2xl md:text-4xl font-extrabold text-lightPurple mb-8 md:mb-10">
+        XRPL EVM ecosystem TVL
       </h2>
-      <div className="mb-6 sm:mb-8">
-        <NetworkSelector env={env} onChange={onEnvChange} />
+      <p className="text-center text-green text-3xl md:text-5xl mb-6 md:mb-8 min-h-[3.5rem] flex items-center justify-center">
+        {loading ? (
+          <span
+            className="inline-block animate-spin mr-2 align-middle"
+            style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              border: '2px solid #32E685',
+              borderTop: '4px solid transparent',
+              borderRadius: '50%',
+            }}
+          ></span>
+        ) : (
+          '$' + total.toLocaleString(undefined, {
+            maximumFractionDigits: 0,
+          })
+        )}
+      </p>
+
+      {/* filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 justify-center mb-4 md:mb-6 text-sm md:text-base min-w-xl mx-auto">
+        <Filters
+          label="Source"
+          value={src}
+          onChange={setSrc}
+          opts={['all', ...new Set(rows.map(r => r.source))]}
+        />
+        <Filters
+          label="Destination"
+          value={dst}
+          onChange={setDst}
+          opts={['all', ...new Set(rows.map(r => r.dest))]}
+        />
+        <Filters
+          label="Symbol"
+          value={sym}
+          onChange={setSym}
+          opts={['all', ...new Set(rows.map(r => r.symbol))]}
+        />
       </div>
-      <div className="w-full rounded-2xl overflow-hidden shadow-xl bg-darkPurple/90">
-        <table className="min-w-full">
-          <thead>
-            <tr>
-              <th className="px-6 sm:px-8 py-4 sm:py-5 text-center text-lightPurple text-lg sm:text-xl font-semibold bg-darkPurple/95">
-                Chain
-              </th>
-              <th className="px-6 sm:px-8 py-4 sm:py-5 text-center text-lightPurple text-lg sm:text-xl font-semibold bg-darkPurple/95">
-                Balance
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibleChains.map((chain, idx) => (
-              <tr
-                key={chain.key}
-                className={
-                  idx === visibleChains.length - 1
-                    ? ''
-                    : 'border-b border-black/30'
-                }
-                style={{
-                  background: idx % 2 === 0 ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.04)'
-                }}
-              >
-                <td className="px-6 sm:px-8 py-4 sm:py-6 text-white font-medium text-base sm:text-lg text-center">{chain.displayName}</td>
-                <td className="px-6 sm:px-8 py-4 sm:py-6 text-center">
-                  {loading
-                    ? <span className="text-lightPurple animate-pulse">Loading…</span>
-                    : data[chain.key]?.error
-                      ? <span className="text-red-400">api failed</span>
-                      : <span className="text-green font-mono text-lg sm:text-xl">{data[chain.key]?.amount ?? '0'}</span>
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[350px]">
+          <Table rows={list} loading={loading} />
+        </div>
       </div>
     </div>
   );
-};
+}
+export default Dashboard;
