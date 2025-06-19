@@ -37,7 +37,7 @@ A **zero‑backend** web application that tracks the total value locked (TVL) ac
 * **Vite** – blazingly fast dev‑server & optimised production build.
 * **Tailwind CSS** – utility‑first styling.
 * **eslint / typescript‑eslint** – type‑aware linting.
-* **XRPL Explorer API** – supplies ERC‑20 totals on XRPL EVM.
+* **XRPL EVM Explorer API** – supplies ERC‑20 totals on XRPL EVM.
 * **Cosmos LCD REST** – supplies IBC token totals on Osmosis, Injective, etc.
 * **Coingecko / Binance / CoinMarketCap** – price oracles with graceful fallback.
 
