@@ -67,12 +67,12 @@ export async function loadRows():Promise<Row[]> {
       } catch (e) {
         console.error('Cosmos XRP row error', c, e);
       }
-      const q=Number(raw)/10**6;
+      const q=Number(raw)/10**18;
       return {
         key:`xrp-${c.key}`,
         symbol:'XRP',
-        decimals:6,
-        source:'XRPL',
+        decimals:18,
+        source:'XRPL EVM',
         dest: c.name as Destination,
         denom:c.denom,
         cg:'ripple',

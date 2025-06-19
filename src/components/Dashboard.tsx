@@ -23,7 +23,7 @@ function Dashboard() {
   return (
     <div className="max-w-5xl mx-auto py-10 font-work text-white px-4">
       <h2 className="text-center text-4xl font-extrabold text-lightPurple mb-2">
-        TVL across XRPL EVM ecosystem
+        XRPL EVM ecosystem TVL
       </h2>
       <p className="text-center text-green text-3xl mb-8">
         {loading
