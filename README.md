@@ -2,10 +2,6 @@
 
 A **zero‑backend** web application that tracks the total value locked (TVL) across the XRPL EVM ecosystem and its IBC neighbours. The dashboard fetches on‑chain supply data, combines it with live USD prices, and presents everything in a single, filterable table.
 
-<p align="center">
-  <img src=".github/screenshot.png" alt="XRPL EVM TVL Dashboard" width="700" />
-</p>
-
 ---
 
 ## Table of Contents
