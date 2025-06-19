@@ -41,7 +41,7 @@ export const Table = ({ rows, loading }: { rows: Row[], loading: boolean }) => (
             <td className="py-3 px-2 align-middle">{r.dest}</td>
             <td className="py-3 px-6 font-mono align-middle">{r.quantity.toLocaleString()}</td>
             <td className="py-3 px-6 font-mono text-green align-middle">
-              {r.valueUsd.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 })}
+              {'$' + r.valueUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}
             </td>
           </tr>
         ))}
