@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Env } from '../types';
-import type { ChainConfig } from '../types';
+import type { Env, ChainConfig } from '../types';
 import { fetchTotalSupply } from '../services/supplyService';
 
 interface SupplyState {

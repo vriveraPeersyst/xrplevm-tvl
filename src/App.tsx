@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { Dashboard } from './components/Dashboard';
+import React from 'react';
 import BrandLines from "./components/BrandLines";
+import Dashboard from './components/Dashboard';
 
 import './App.css'
 
 export default function App() {
-  const [env, setEnv] = useState<'testnet'|'mainnet'>('testnet');
   return (
-    <div className="min-h-screen bg-black font-work">
+    <div className="min-h-screen bg-black">
       <BrandLines />
       <header className="bg-darkPurple text-white p-6 flex flex-col items-center">
         <img
@@ -17,7 +16,7 @@ export default function App() {
           style={{ objectFit: 'contain' }}
         />
       </header>
-      <Dashboard env={env} onEnvChange={setEnv} />
+      <Dashboard/>
     </div>
   );
 }
