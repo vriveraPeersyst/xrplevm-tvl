@@ -24,7 +24,7 @@ export const Table = ({ rows, loading }: { rows: Row[], loading: boolean }) => (
             style={{ position: 'relative', zIndex: 0, transitionProperty: 'box-shadow, transform, background-color', willChange: 'transform, box-shadow' }}
             onMouseEnter={e => {
               e.currentTarget.style.zIndex = '20';
-              e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(200,144,255,0.25), 0 1.5px 8px 0 rgba(50,230,133,0.10)';
+              e.currentTarget.style.boxShadow = '0 2px 2px 0 rgba(200,144,255,0.25), 0 1.5px 2px 0 rgba(50,230,133,0.10)';
               e.currentTarget.style.transform = 'scale(1.025)';
               e.currentTarget.style.background = 'rgba(200,144,255,0.10)';
             }}
@@ -35,7 +35,7 @@ export const Table = ({ rows, loading }: { rows: Row[], loading: boolean }) => (
               e.currentTarget.style.background = '';
             }}
           >
-            <td className="py-3 px-2 text-center align-middle"><Avatar src={r.logo} /></td>
+            <td className="py-3 px-8 text-center align-middle"><Avatar src={r.logo} /></td>
             <td className="py-3 px-6 font-semibold align-middle">{r.symbol}</td>
             <td className="py-3 px-2 align-middle">{r.source}</td>
             <td className="py-3 px-2 align-middle">{r.dest}</td>
