@@ -26,6 +26,13 @@ function Dashboard() {
     [rows, src, dst, sym],
   );
 
+  // Compute filtered total TVL (sum of valueUsd for filtered rows)
+  const filteredTotal = useMemo(
+    () =>
+      list.reduce((sum, r) => sum + (typeof r.valueUsd === 'number' ? r.valueUsd : 0), 0),
+    [list],
+  );
+
   function handleRowClick(row: Row) {
     if (!baseAsset) {
       setBaseAsset(row);
@@ -62,8 +69,8 @@ function Dashboard() {
             }}
           ></span>
         ) : (
-          '$' + total.toLocaleString(undefined, {
-            maximumFractionDigits: 0,
+          '$' + filteredTotal.toLocaleString(undefined, {
+            maximumFractionDigits: 2,
           })
         )}
       </p>
