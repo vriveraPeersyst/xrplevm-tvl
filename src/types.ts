@@ -21,5 +21,6 @@ export interface Row extends AssetStatic {
   logo: string;          // token icon
   chainLogo: string;     // destination badge
   quantity: number;
+  priceUsd: number;
   valueUsd: number;
 }

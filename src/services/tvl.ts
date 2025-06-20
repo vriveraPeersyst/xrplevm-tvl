@@ -6,14 +6,26 @@ import type { Row, Destination } from '../types';
 const API_EXPLORER ='https://explorer-mainnet.aws.peersyst.tech/api/v2/tokens';
 
 async function peersystSupply(addr:string){
-  const j=await fetch(`${API_EXPLORER}/${addr}`).then(r=>r.json());
-  return j.total_supply ?? '0';
+  try {
+    const res = await fetch(`${API_EXPLORER}/${addr}`);
+    if (!res.ok) return '0';
+    const j = await res.json();
+    return j.total_supply ?? '0';
+  } catch {
+    return '0';
+  }
 }
 
 async function cosmosSupply(endpoint:string,denom:string){
-  const url=`${endpoint}/cosmos/bank/v1beta1/supply/by_denom?denom=${encodeURIComponent(denom)}`;
-  const j=await fetch(url).then(r=>r.json());
-  return j.amount?.amount ?? '0';
+  try {
+    const url=`${endpoint}/cosmos/bank/v1beta1/supply/by_denom?denom=${encodeURIComponent(denom)}`;
+    const res = await fetch(url);
+    if (!res.ok) return '0';
+    const j = await res.json();
+    return j.amount?.amount ?? '0';
+  } catch {
+    return '0';
+  }
 }
 
 export async function loadRows():Promise<Row[]> {
@@ -27,6 +39,7 @@ export async function loadRows():Promise<Row[]> {
       logo: `/src/assets/tokens/${a.image}`,
       chainLogo: '/chains/xrpl-evm.svg',
       quantity: q,
+      priceUsd: usd,
       valueUsd: q * usd,
     } as Row;
   }));
@@ -49,6 +62,7 @@ export async function loadRows():Promise<Row[]> {
       logo: '/src/assets/tokens/xrp.png',
       chainLogo: c.logo,
       quantity: q,
+      priceUsd: xrpUsd,
       valueUsd: q * xrpUsd,
     } as Row;
   }));
