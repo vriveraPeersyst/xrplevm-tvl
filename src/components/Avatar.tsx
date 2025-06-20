@@ -1,4 +1,4 @@
-export const Avatar = ({ src, size = 24 }: { src: string, size?: number }) => {
+export const Avatar = ({ src, size = 32 }: { src: string, size?: number }) => {
   // Use a square flex container with center alignment and no margin collapse
   return (
     <span
