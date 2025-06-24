@@ -15,7 +15,7 @@ export default defineConfig({
       },
       // Elys
       '/api/elysNetwork': {
-        target: 'https://api.elys.network',
+        target: 'http://api.elys.network',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/elysNetwork/, ''),
       },
