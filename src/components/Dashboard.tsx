@@ -17,12 +17,14 @@ function Dashboard() {
 
   const list = useMemo(
     () =>
-      rows.filter(
-        r =>
-          (src === 'all' || r.source === src) &&
-          (dst === 'all' || r.dest === dst) &&
-          (sym === 'all' || r.symbol === sym),
-      ),
+      rows
+        .filter(
+          r =>
+            (src === 'all' || r.source === src) &&
+            (dst === 'all' || r.dest === dst) &&
+            (sym === 'all' || r.symbol === sym),
+        )
+        .sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)), // Sort by TVL descending
     [rows, src, dst, sym],
   );
 

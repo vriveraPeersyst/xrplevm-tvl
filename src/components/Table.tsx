@@ -75,7 +75,13 @@ export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps)
           >
             <td className="py-3 px-8 text-center align-middle"><Avatar src={r.logo} /></td>
             <td className="py-3 px-6 font-semibold align-middle">{r.symbol}</td>
-            <td className="py-3 px-2 align-middle">{r.source}</td>
+            <td className="py-3 px-2 align-middle">{
+              r.symbol === 'XRP' && [
+                'cosmosHub', 'osmo', 'atom', 'elys', 'noble', 'injective'
+              ].some(chain => r.dest?.toLowerCase().includes(chain))
+                ? 'XRPL EVM'
+                : r.source
+            }</td>
             <td className="py-3 px-2 align-middle">{r.dest}</td>
             <td className="py-3 px-6 font-mono align-middle">{typeof r.quantity === 'number' && !isNaN(r.quantity) ? r.quantity.toLocaleString() : '-'}</td>
             <td className="py-3 px-6 font-mono align-middle">
