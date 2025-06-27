@@ -1,24 +1,57 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { useRows } from '../hooks/useRows';
 import { Filters } from './Filters';
 import { Table } from './Table';
+import { getSwapUrl } from '../utils/getSwapUrl';
+import type { Row } from '../types';
 
 function Dashboard() {
-  const { rows, total, loading } = useRows();
+  const { rows, loading } = useRows();
   const [src, setSrc] = useState('all');
   const [dst, setDst] = useState('all');
   const [sym, setSym] = useState('all');
 
+  const [baseAsset, setBaseAsset] = useState<Row | null>(null);
+  const [highlightedKey, setHighlightedKey] = useState<string | undefined>(undefined);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const list = useMemo(
     () =>
-      rows.filter(
-        r =>
-          (src === 'all' || r.source === src) &&
-          (dst === 'all' || r.dest === dst) &&
-          (sym === 'all' || r.symbol === sym),
-      ),
+      rows
+        .filter(
+          r =>
+            (src === 'all' || r.source === src) &&
+            (dst === 'all' || r.dest === dst) &&
+            (sym === 'all' || r.symbol === sym),
+        )
+        .sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)), // Sort by TVL descending
     [rows, src, dst, sym],
   );
+
+  // Compute filtered total TVL (sum of valueUsd for filtered rows)
+  const filteredTotal = useMemo(
+    () =>
+      list.reduce((sum, r) => sum + (typeof r.valueUsd === 'number' ? r.valueUsd : 0), 0),
+    [list],
+  );
+
+  function handleRowClick(row: Row) {
+    if (!baseAsset) {
+      setBaseAsset(row);
+      setHighlightedKey(row.key);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        setBaseAsset(null);
+        setHighlightedKey(undefined);
+      }, 5000);
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      const url = getSwapUrl(baseAsset, row);
+      window.open(url, '_blank');
+      setBaseAsset(null);
+      setHighlightedKey(undefined);
+    }
+  }
 
   return (
     <div className="max-w-5xl mx-auto py-5 font-work text-white px-1 text-base md:text-lg">
@@ -38,8 +71,8 @@ function Dashboard() {
             }}
           ></span>
         ) : (
-          '$' + total.toLocaleString(undefined, {
-            maximumFractionDigits: 0,
+          '$' + filteredTotal.toLocaleString(undefined, {
+            maximumFractionDigits: 2,
           })
         )}
       </p>
@@ -67,7 +100,12 @@ function Dashboard() {
       </div>
       <div className="w-full overflow-x-auto">
         <div className="min-w-[350px]">
-          <Table rows={list} loading={loading} />
+          <Table
+            rows={list}
+            loading={loading}
+            onRowClick={handleRowClick}
+            highlightedKey={highlightedKey}
+          />
         </div>
       </div>
     </div>

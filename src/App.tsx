@@ -1,4 +1,3 @@
-import React from 'react';
 import BrandLines from "./components/BrandLines";
 import Dashboard from './components/Dashboard';
 

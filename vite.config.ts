@@ -5,16 +5,17 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: process.env.PORT ? parseInt(process.env.PORT as string, 10) : 5173,
     proxy: {
       // XRPL EVM
       '/api/xrplEvm': {
-        target: 'https://cosmos-api-mainnet.aws.peersyst.tech',
+        target: 'https://cosmos-api.xrplevm.org/',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/xrplEvm/, ''),
       },
       // Elys
       '/api/elysNetwork': {
-        target: 'https://api.elys.network',
+        target: 'http://api.elys.network',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/elysNetwork/, ''),
       },
