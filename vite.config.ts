@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // XRPL EVM
       '/api/xrplEvm': {
-        target: 'https://cosmos-api-mainnet.aws.peersyst.tech',
+        target: 'https://cosmos-api.xrplevm.org/',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/xrplEvm/, ''),
       },

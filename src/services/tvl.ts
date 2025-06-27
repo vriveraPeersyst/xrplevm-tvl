@@ -34,6 +34,10 @@ export async function loadRows():Promise<Row[]> {
     const raw = await peersystSupply(a.address!);
     const usd = await getPrice({ cg: a.cg, cmc: a.cmc, binance: a.binance });
     const q = Number(raw) / 10 ** a.decimals;
+    if (a.symbol === 'WETH' || a.symbol === 'WBTC' || a.symbol === 'ATOM') {
+      // eslint-disable-next-line no-console
+      console.log(`[DEBUG] ${a.symbol} raw:`, raw, 'decimals:', a.decimals, 'quantity:', q, 'usd:', usd, 'valueUsd:', q * usd);
+    }
     return {
       ...a,
       logo: `/src/assets/tokens/${a.image}`,

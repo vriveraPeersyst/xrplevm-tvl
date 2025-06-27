@@ -6,7 +6,7 @@ import { getSwapUrl } from '../utils/getSwapUrl';
 import type { Row } from '../types';
 
 function Dashboard() {
-  const { rows, total, loading } = useRows();
+  const { rows, loading } = useRows();
   const [src, setSrc] = useState('all');
   const [dst, setDst] = useState('all');
   const [sym, setSym] = useState('all');
