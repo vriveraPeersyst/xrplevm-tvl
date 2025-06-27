@@ -13,5 +13,5 @@ export const ASSETS = [
   { key:'usdc-noble',symbol:'USDC', decimals:6,  source:'Noble',      dest:'XRPL EVM', address:'0xDDF7e0b30A631076cD80bc12A48C0e95404b4A41', cg:'usd-coin', cmc:'usd-coin', binance:'USDCUSDT', image: 'usdc.png' },
   { key:'elys',      symbol:'ELYS', decimals:6,  source:'Elys',       dest:'XRPL EVM', address:'0x55A7Fc91A3Bf505b0136d84A21A875ABD1987D0e', cg:'elys-token', cmc:'elys-network', binance:'ELYSUSDT', image: 'elys.png' },
   { key:'inj',       symbol:'INJ',  decimals:18, source:'Injective',  dest:'XRPL EVM', address:'0x81F090B51f67e0A6afdC8d9347516dB519712c2f', cg:'injective-protocol', cmc:'injective-protocol', binance:'INJUSDT', image: 'inj.png' },
-  { key:'atom',      symbol:'ATOM', decimals:6,  source:'CosmosHub',  dest:'XRPL EVM', address:'', cg:'cosmos-hub', cmc:'cosmos', binance:'ATOMUSDT', image: 'atom.png' },
+  { key:'atom',      symbol:'ATOM', decimals:6,  source:'CosmosHub',  dest:'XRPL EVM', address:'0xC2bd90cD3d26848101Ba880445F119b22A1e254E', cg:'cosmos-hub', cmc:'cosmos', binance:'ATOMUSDT', image: 'atom.png' },
 ];
