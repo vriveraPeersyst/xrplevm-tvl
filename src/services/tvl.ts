@@ -40,7 +40,7 @@ export async function loadRows():Promise<Row[]> {
     }
     return {
       ...a,
-      logo: `/src/assets/tokens/${a.image}`,
+      logo: `/assets/tokens/${a.image}`,
       chainLogo: '/chains/xrpl-evm.svg',
       quantity: q,
       priceUsd: usd,
@@ -63,7 +63,7 @@ export async function loadRows():Promise<Row[]> {
       cg: 'ripple',
       cmc: 'ripple',
       binance: 'XRPUSDT',
-      logo: '/src/assets/tokens/xrp.png',
+      logo: '/assets/tokens/xrp.png',
       chainLogo: c.logo,
       quantity: q,
       priceUsd: xrpUsd,

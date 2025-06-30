@@ -9,7 +9,7 @@ export default function App() {
       <BrandLines />
       <header className="bg-darkPurple text-white p-6 flex flex-col items-center">
         <img
-          src="/src/assets/XRPLEVM_FullWhiteLogo.png"
+          src="/assets/XRPLEVM_FullWhiteLogo.png"
           alt="XRPL EVM Logo"
           className="mx-auto h-12 md:h-16"
           style={{ objectFit: 'contain' }}
