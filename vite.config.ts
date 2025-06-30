@@ -64,6 +64,6 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: ['tvl.peersyst.tech'],
+    allowedHosts: ['*'],
   }
 })
