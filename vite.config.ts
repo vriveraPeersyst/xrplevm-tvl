@@ -62,8 +62,9 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/binance/, ''),
       },
     },
+    allowedHosts: true,
   },
   preview: {
-    allowedHosts: ['*'],
-  }
+    allowedHosts: true,
+  },
 })
