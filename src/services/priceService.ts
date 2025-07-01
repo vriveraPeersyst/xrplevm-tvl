@@ -17,12 +17,33 @@ export interface PriceIds {
   binance: string;
 }
 
+const CG_RATE_LIMIT_KEY = 'cg-rate-limit';
+const CG_RATE_LIMIT_TTL = 2 * 60 * 1000; // 2 minutes
+
+function setCGRatelimit() {
+  localStorage.setItem(CG_RATE_LIMIT_KEY, Date.now().toString());
+}
+function isCGRatelimited(): boolean {
+  const ts = Number(localStorage.getItem(CG_RATE_LIMIT_KEY) || '0');
+  return !!ts && (Date.now() - ts < CG_RATE_LIMIT_TTL);
+}
+
 // Batch fetch Coingecko prices for multiple ids
 async function fetchCGs(cgIds: string[]): Promise<Record<string, number>> {
   if (!cgIds.length) return {};
+  if (isCGRatelimited()) {
+    // Don't even try if recently rate-limited
+    return Object.fromEntries(cgIds.map(id => [id, NaN]));
+  }
   try {
     const ids = cgIds.join(',');
     const res = await fetch(`/api/coingecko/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+    if (res.status === 429) {
+      setCGRatelimit();
+      // eslint-disable-next-line no-console
+      console.warn(`[priceService] Coingecko rate limited (429)`);
+      return Object.fromEntries(cgIds.map(id => [id, NaN]));
+    }
     if (!res.ok) throw new Error(`CG_${res.status}`);
     const json = await res.json();
     const out: Record<string, number> = {};
@@ -59,6 +80,27 @@ async function fetchBinance(binance: string): Promise<number> {
   }
 }
 
+// Fetch ELYS price from Elys DEX API
+async function fetchElysElysUsdt(): Promise<number> {
+  try {
+    const res = await fetch('https://prices.elys.network/realtime/market-summary');
+    if (!res.ok) throw new Error(`Elys_${res.status}`);
+    const data = await res.json();
+    // Find ELYS-USDT
+    const elys = Array.isArray(data)
+      ? data.find((d: any) => d.instrument === 'ELYS-USDT')
+      : Array.isArray(data.data)
+        ? data.data.find((d: any) => d.instrument === 'ELYS-USDT')
+        : undefined;
+    if (!elys || typeof elys.price !== 'number') return NaN;
+    return elys.price;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[priceService] Elys DEX price fetch failed:', e);
+    return NaN;
+  }
+}
+
 /**
  * Batch get USD prices for multiple ids.
  * @param idsArr Array of PriceIds
@@ -74,26 +116,59 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
   });
 
   let cgPrices: Record<string, number> = {};
-  if (uncachedCgIds.length) {
-    cgPrices = await fetchCGs(uncachedCgIds);
-    for (const id of uncachedCgIds) {
-      const price = cgPrices[id];
-      if (!isNaN(price) && price > 0) {
-        cache[id] = { price, ts: now };
-      }
+  // Special handling for ELYS: fetch from Elys DEX API
+  let elysPrice: number | undefined;
+  const hasElys = idsArr.some(i => i.cg === 'elys-token');
+  if (hasElys) {
+    elysPrice = await fetchElysElysUsdt();
+    if (!isNaN(elysPrice) && elysPrice > 0) {
+      cache['elys-token'] = { price: elysPrice, ts: now };
+      saveCache(cache);
     }
-    saveCache(cache);
   }
+
+  if (uncachedCgIds.length) {
+    // Remove 'elys-token' from Coingecko batch if present
+    const filteredCgIds = uncachedCgIds.filter(id => id !== 'elys-token');
+    if (filteredCgIds.length) {
+      cgPrices = await fetchCGs(filteredCgIds);
+      for (const id of filteredCgIds) {
+        const price = cgPrices[id];
+        if (!isNaN(price) && price > 0) {
+          cache[id] = { price, ts: now };
+        }
+      }
+      saveCache(cache);
+    }
+  }
+
+  const STABLES = [
+    'first-digital-usd', // FDUSD
+    'tether',            // USDT
+    'dai',               // DAI
+    'usd-coin',          // USDC
+  ];
+  const STABLE_BINANCE = [
+    'FDUSDUSDT',
+    'USDTUSD', 'USDTUSDT',
+    'DAIUSDT',
+    'USDCUSDT',
+  ];
 
   const result: Record<string, number> = {};
   for (const ids of idsArr) {
     const cacheKey = ids.cg || ids.binance;
-    let price = cache[ids.cg]?.price;
-    if (!price || price <= 0) {
-      price = cgPrices[ids.cg];
+    let price: number | undefined;
+    if (ids.cg === 'elys-token') {
+      price = elysPrice;
+    } else {
+      price = cache[ids.cg]?.price;
+      if (!price || price <= 0) {
+        price = cgPrices[ids.cg];
+      }
     }
-    if (!isNaN(price) && price > 0) {
-      result[cacheKey] = price;
+    if (!isNaN(price!) && price! > 0) {
+      result[cacheKey] = price!;
       continue;
     }
     // fallback: try Binance
@@ -104,6 +179,13 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
         cache[ids.binance] = { price, ts: now };
         saveCache(cache);
       }
+    }
+    // Stablecoin fallback to $1
+    const isStable =
+      STABLES.includes(ids.cg) ||
+      STABLE_BINANCE.includes(ids.binance);
+    if ((isNaN(price) || price <= 0) && isStable) {
+      price = 1;
     }
     result[cacheKey] = !isNaN(price) && price > 0 ? price : 0;
   }
