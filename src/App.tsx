@@ -7,7 +7,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black">
       <BrandLines />
-      <header className="bg-darkPurple text-white p-6 flex flex-col items-center">
+      <header className="text-white p-6 flex flex-col items-center">
         <img
           src="/assets/XRPLEVM_FullWhiteLogo.png"
           alt="XRPL EVM Logo"
