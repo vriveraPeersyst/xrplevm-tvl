@@ -32,7 +32,7 @@ export async function loadRows():Promise<Row[]> {
   /* 1) ERC-20 + IBC assets on XRPL EVM */
   const erc = await Promise.all(ASSETS.map(async a => {
     const raw = await peersystSupply(a.address!);
-    const usd = await getPrice({ cg: a.cg, cmc: a.cmc, binance: a.binance });
+    const usd = await getPrice({ cg: a.cg, binance: a.binance }); // removed cmc
     const q = Number(raw) / 10 ** a.decimals;
     if (a.symbol === 'WETH' || a.symbol === 'WBTC' || a.symbol === 'ATOM') {
       // eslint-disable-next-line no-console
@@ -49,7 +49,7 @@ export async function loadRows():Promise<Row[]> {
   }));
 
   /* 2) XRP sitting on Cosmos chains – treat as extra rows */
-  const xrpUsd = await getPrice({ cg: 'ripple', cmc: 'ripple', binance: 'XRPUSDT' });
+  const xrpUsd = await getPrice({ cg: 'ripple', binance: 'XRPUSDT' }); // removed cmc
   const xrpRows = await Promise.all(CHAINS.map(async c => {
     const raw = await cosmosSupply(c.endpoint, c.denom);
     const q = Number(raw) / 10 ** 18;
@@ -61,7 +61,7 @@ export async function loadRows():Promise<Row[]> {
       dest: c.name as Destination,
       denom: c.denom,
       cg: 'ripple',
-      cmc: 'ripple',
+      // cmc: 'ripple', // removed
       binance: 'XRPUSDT',
       logo: '/assets/tokens/xrp.png',
       chainLogo: c.logo,

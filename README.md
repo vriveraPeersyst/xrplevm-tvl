@@ -22,7 +22,7 @@ A **zero‑backend** web application that tracks the total value locked (TVL) ac
 
 |     | Capability                                                                                                                                             |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 📈  | **Real‑time TVL** – combines on‑chain supply with USD prices (Coingecko → Binance → CoinMarketCap fallback).                                           |
+| 📈  | **Real‑time TVL** – combines on‑chain supply with USD prices (Coingecko → Binance fallback).                                                           |
 | 🔍  | **Instant filtering** by **Source chain**, **Destination chain**, and **Token symbol**.                                                                |
 | ⚡   | **Hot Module Replacement** in development via Vite.                                                                                                    |
 | 💾  | **Client‑side price cache** (5 min) to stay within public API rate limits.                                                                             |
@@ -39,7 +39,7 @@ A **zero‑backend** web application that tracks the total value locked (TVL) ac
 * **eslint / typescript‑eslint** – type‑aware linting.
 * **XRPL EVM Explorer API** – supplies ERC‑20 totals on XRPL EVM.
 * **Cosmos LCD REST** – supplies IBC token totals on Osmosis, Injective, etc.
-* **Coingecko / Binance / CoinMarketCap** – price oracles with graceful fallback.
+* **Coingecko / Binance** – price oracles with graceful fallback.
 
 ---
 
@@ -142,3 +142,8 @@ Feel free to open **Issues** for feature requests or bugs.
 ## Licence
 
 This project is released under the **MIT License** – see [LICENCE](LICENCE) for details.
+
+> **⚠️ Note:**  
+> In production, you must proxy `/api/*` endpoints (e.g., `/api/coingecko`, `/api/binance`) to their real upstream APIs.  
+> The Vite dev server handles this automatically in development, but in production you need to set up your own proxy (e.g., serverless function, Cloudflare Worker, or backend server).  
+> Otherwise, browser requests will be blocked by CORS and prices will not load.

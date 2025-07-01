@@ -15,6 +15,7 @@ export interface AssetStatic {
   address?: string;      // contracts on XRPL-EVM
   denom?: string;        // axrp on Cosmos
   cg: string;            // Coingecko id
+  binance: string;       // Binance symbol
 }
 
 export interface Row extends AssetStatic {
