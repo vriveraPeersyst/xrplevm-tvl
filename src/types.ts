@@ -1,5 +1,5 @@
 export type Source =
-  | 'XRPL' | 'Ethereum' | 'Osmosis' | 'Elys' | 'Injective'
+  | 'XRPL' | 'Ethereum' | 'Osmosis' | 'Elys' | 'Elys Network' | 'Injective'
   | 'Noble' | 'Cosmos Hub' | 'BSC' | 'Solana' | 'Sui';
 
 export type Destination =

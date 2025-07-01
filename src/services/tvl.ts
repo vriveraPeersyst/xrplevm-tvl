@@ -3,7 +3,7 @@ import { CHAINS } from '../config/chains';
 import { getPrice } from './priceService';
 import type { Row, Destination } from '../types';
 
-const API_EXPLORER ='https://explorer-mainnet.aws.peersyst.tech/api/v2/tokens';
+const API_EXPLORER ='https://explorer.xrplevm.org/api/v2/tokens';
 
 async function peersystSupply(addr:string){
   try {
@@ -31,7 +31,7 @@ async function cosmosSupply(endpoint:string,denom:string){
 export async function loadRows():Promise<Row[]> {
   /* 1) ERC-20 + IBC assets on XRPL EVM */
   const erc = await Promise.all(ASSETS.map(async a => {
-    const raw = await peersystSupply(a.address!);
+    const raw = a.address ? await peersystSupply(a.address) : '0';
     const usd = await getPrice({ cg: a.cg, binance: a.binance }); // removed cmc
     const q = Number(raw) / 10 ** a.decimals;
     if (a.symbol === 'WETH' || a.symbol === 'WBTC' || a.symbol === 'ATOM') {

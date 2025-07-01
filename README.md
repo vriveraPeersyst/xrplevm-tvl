@@ -76,21 +76,13 @@ The output in `dist/` is completely static and can be deployed to any CDN (e.g. 
 
 ## Configuration
 
-### Environment variables
+### CORS and API proxies
 
-| Variable           | Purpose                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------- |
-| `VITE_CMC_API_KEY` | Optional CoinMarketCap key used as the third‑level price oracle if Coingecko & Binance both fail. |
-
-Create a `.env` file at the project root (same level as `vite.config.ts`):
-
-```bash
-VITE_CMC_API_KEY=your_cmc_key_here
-```
-
-### API proxies (development only)
-
-The dev‑server automatically forwards `/api/*` calls to their real endpoints. See **[`vite.config.ts`](xrp-dashboard/vite.config.ts)** for the full list.
+> **CORS Notice:**  
+> Most third-party APIs (like Coingecko, Binance) do **not** allow direct browser access in production due to CORS restrictions.  
+> In development, the Vite dev server proxies `/api/*` calls to the real endpoints, bypassing CORS.  
+> **In production, you must deploy your own proxy server** (e.g., serverless function, Cloudflare Worker, or backend) to forward `/api/*` requests to the upstream APIs and add the appropriate `Access-Control-Allow-Origin` header.  
+> Otherwise, browser requests will be blocked by CORS and prices will not load.
 
 ---
 
@@ -139,6 +131,14 @@ Feel free to open **Issues** for feature requests or bugs.
 
 ---
 
+## Licence
+
+This project is released under the **MIT License** – see [LICENCE](LICENCE) for details.
+
+> **⚠️ Note:**  
+> In production, you must proxy `/api/*` endpoints (e.g., `/api/coingecko`, `/api/binance`) to their real upstream APIs.  
+> The Vite dev server handles this automatically in development, but in production you need to set up your own proxy (e.g., serverless function, Cloudflare Worker, or backend server).  
+> Otherwise, browser requests will be blocked by CORS and prices will not load.
 ## Licence
 
 This project is released under the **MIT License** – see [LICENCE](LICENCE) for details.
