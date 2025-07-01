@@ -120,10 +120,16 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
   let elysPrice: number | undefined;
   const hasElys = idsArr.some(i => i.cg === 'elys-token');
   if (hasElys) {
-    elysPrice = await fetchElysElysUsdt();
-    if (!isNaN(elysPrice) && elysPrice > 0) {
-      cache['elys-token'] = { price: elysPrice, ts: now };
-      saveCache(cache);
+    // Use fetchElysElysUsdt helper
+    try {
+      elysPrice = await fetchElysElysUsdt();
+      if (elysPrice !== undefined && !isNaN(elysPrice) && elysPrice > 0) {
+        cache['elys-token'] = { price: elysPrice, ts: now };
+        saveCache(cache);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('[priceService] Elys DEX price fetch failed:', e);
     }
   }
 
