@@ -1,12 +1,18 @@
-const CACHE_KEY = 'price-cache';
+const CACHE_KEY = "price-cache";
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-interface CacheEntry { price: number; ts: number }
+interface CacheEntry {
+  price: number;
+  ts: number;
+}
 type Cache = Record<string, CacheEntry>;
 
 function loadCache(): Cache {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); }
-  catch { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
 }
 function saveCache(c: Cache) {
   localStorage.setItem(CACHE_KEY, JSON.stringify(c));
@@ -17,15 +23,15 @@ export interface PriceIds {
   binance: string;
 }
 
-const CG_RATE_LIMIT_KEY = 'cg-rate-limit';
+const CG_RATE_LIMIT_KEY = "cg-rate-limit";
 const CG_RATE_LIMIT_TTL = 2 * 60 * 1000; // 2 minutes
 
 function setCGRatelimit() {
   localStorage.setItem(CG_RATE_LIMIT_KEY, Date.now().toString());
 }
 function isCGRatelimited(): boolean {
-  const ts = Number(localStorage.getItem(CG_RATE_LIMIT_KEY) || '0');
-  return !!ts && (Date.now() - ts < CG_RATE_LIMIT_TTL);
+  const ts = Number(localStorage.getItem(CG_RATE_LIMIT_KEY) || "0");
+  return !!ts && Date.now() - ts < CG_RATE_LIMIT_TTL;
 }
 
 // Batch fetch Coingecko prices for multiple ids
@@ -33,35 +39,39 @@ async function fetchCGs(cgIds: string[]): Promise<Record<string, number>> {
   if (!cgIds.length) return {};
   if (isCGRatelimited()) {
     // Don't even try if recently rate-limited
-    return Object.fromEntries(cgIds.map(id => [id, NaN]));
+    return Object.fromEntries(cgIds.map((id) => [id, NaN]));
   }
   try {
-    const ids = cgIds.join(',');
-    const res = await fetch(`/api/coingecko/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+    const ids = cgIds.join(",");
+    const res = await fetch(
+      `/api/coingecko/api/v3/simple/price?ids=${ids}&vs_currencies=usd`
+    );
     if (res.status === 429) {
       setCGRatelimit();
       // eslint-disable-next-line no-console
       console.warn(`[priceService] Coingecko rate limited (429)`);
-      return Object.fromEntries(cgIds.map(id => [id, NaN]));
+      return Object.fromEntries(cgIds.map((id) => [id, NaN]));
     }
     if (!res.ok) throw new Error(`CG_${res.status}`);
     const json = await res.json();
     const out: Record<string, number> = {};
-    cgIds.forEach(id => {
+    cgIds.forEach((id) => {
       out[id] = json[id]?.usd ?? NaN;
     });
     return out;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn(`[priceService] Coingecko batch fetch failed:`, e);
-    return Object.fromEntries(cgIds.map(id => [id, NaN]));
+    return Object.fromEntries(cgIds.map((id) => [id, NaN]));
   }
 }
 
 async function fetchBinance(binance: string): Promise<number> {
-  if (!binance || binance.trim() === '') return NaN;
+  if (!binance || binance.trim() === "") return NaN;
   try {
-    const res = await fetch(`/api/binance/api/v3/ticker/price?symbol=${binance}`);
+    const res = await fetch(
+      `/api/binance/api/v3/ticker/price?symbol=${binance}`
+    );
     if (!res.ok) {
       if (res.status === 400) {
         // eslint-disable-next-line no-console
@@ -83,20 +93,22 @@ async function fetchBinance(binance: string): Promise<number> {
 // Fetch ELYS price from Elys DEX API
 async function fetchElysElysUsdt(): Promise<number> {
   try {
-    const res = await fetch('https://prices.elys.network/realtime/market-summary');
+    const res = await fetch(
+      "https://prices.elys.network/realtime/market-summary"
+    );
     if (!res.ok) throw new Error(`Elys_${res.status}`);
     const data = await res.json();
     // Find ELYS-USDT
     const elys = Array.isArray(data)
-      ? data.find((d: any) => d.instrument === 'ELYS-USDT')
+      ? data.find((d: any) => d.instrument === "ELYS-USDT")
       : Array.isArray(data.data)
-        ? data.data.find((d: any) => d.instrument === 'ELYS-USDT')
-        : undefined;
-    if (!elys || typeof elys.price !== 'number') return NaN;
+      ? data.data.find((d: any) => d.instrument === "ELYS-USDT")
+      : undefined;
+    if (!elys || typeof elys.price !== "number") return NaN;
     return elys.price;
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn('[priceService] Elys DEX price fetch failed:', e);
+    console.warn("[priceService] Elys DEX price fetch failed:", e);
     return NaN;
   }
 }
@@ -106,11 +118,13 @@ async function fetchElysElysUsdt(): Promise<number> {
  * @param idsArr Array of PriceIds
  * @returns Record<string, number> where key is cg or binance id
  */
-export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, number>> {
+export async function getPrices(
+  idsArr: PriceIds[]
+): Promise<Record<string, number>> {
   const cache = loadCache();
   const now = Date.now();
-  const cgIds = idsArr.map(i => i.cg).filter(Boolean);
-  const uncachedCgIds = cgIds.filter(id => {
+  const cgIds = idsArr.map((i) => i.cg).filter(Boolean);
+  const uncachedCgIds = cgIds.filter((id) => {
     const entry = cache[id];
     return !(entry && now - entry.ts < TTL_MS && entry.price > 0);
   });
@@ -118,24 +132,24 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
   let cgPrices: Record<string, number> = {};
   // Special handling for ELYS: fetch from Elys DEX API
   let elysPrice: number | undefined;
-  const hasElys = idsArr.some(i => i.cg === 'elys-token');
+  const hasElys = idsArr.some((i) => i.cg === "elys-token");
   if (hasElys) {
     // Use fetchElysElysUsdt helper
     try {
       elysPrice = await fetchElysElysUsdt();
       if (elysPrice !== undefined && !isNaN(elysPrice) && elysPrice > 0) {
-        cache['elys-token'] = { price: elysPrice, ts: now };
+        cache["elys-token"] = { price: elysPrice, ts: now };
         saveCache(cache);
       }
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn('[priceService] Elys DEX price fetch failed:', e);
+      console.warn("[priceService] Elys DEX price fetch failed:", e);
     }
   }
 
   if (uncachedCgIds.length) {
     // Remove 'elys-token' from Coingecko batch if present
-    const filteredCgIds = uncachedCgIds.filter(id => id !== 'elys-token');
+    const filteredCgIds = uncachedCgIds.filter((id) => id !== "elys-token");
     if (filteredCgIds.length) {
       cgPrices = await fetchCGs(filteredCgIds);
       for (const id of filteredCgIds) {
@@ -149,23 +163,24 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
   }
 
   const STABLES = [
-    'first-digital-usd', // FDUSD
-    'tether',            // USDT
-    'dai',               // DAI
-    'usd-coin',          // USDC
+    "first-digital-usd", // FDUSD
+    "tether", // USDT
+    "dai", // DAI
+    "usd-coin", // USDC
   ];
   const STABLE_BINANCE = [
-    'FDUSDUSDT',
-    'USDTUSD', 'USDTUSDT',
-    'DAIUSDT',
-    'USDCUSDT',
+    "FDUSDUSDT",
+    "USDTUSD",
+    "USDTUSDT",
+    "DAIUSDT",
+    "USDCUSDT",
   ];
 
   const result: Record<string, number> = {};
   for (const ids of idsArr) {
     const cacheKey = ids.cg || ids.binance;
     let price: number | undefined;
-    if (ids.cg === 'elys-token') {
+    if (ids.cg === "elys-token") {
       price = elysPrice;
     } else {
       price = cache[ids.cg]?.price;
@@ -188,8 +203,7 @@ export async function getPrices(idsArr: PriceIds[]): Promise<Record<string, numb
     }
     // Stablecoin fallback to $1
     const isStable =
-      STABLES.includes(ids.cg) ||
-      STABLE_BINANCE.includes(ids.binance);
+      STABLES.includes(ids.cg) || STABLE_BINANCE.includes(ids.binance);
     if ((isNaN(price) || price <= 0) && isStable) {
       price = 1;
     }
@@ -205,4 +219,8 @@ export async function getPrice(ids: PriceIds): Promise<number> {
   const prices = await getPrices([ids]);
   const cacheKey = ids.cg || ids.binance;
   return prices[cacheKey] ?? 0;
+}
+
+export async function loadPrices(ids: PriceIds[]): Promise<void> {
+  await getPrices(ids);
 }

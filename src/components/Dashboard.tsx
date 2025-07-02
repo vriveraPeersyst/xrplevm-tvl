@@ -1,38 +1,47 @@
-import { useMemo, useState, useRef } from 'react';
-import { useRows } from '../hooks/useRows';
-import { Filters } from './Filters';
-import { Table } from './Table';
-import { getSwapUrl } from '../utils/getSwapUrl';
-import type { Row } from '../types';
+import { useMemo, useState, useRef } from "react";
+import { useRows } from "../hooks/useRows";
+import { Filters } from "./Filters";
+import { Table } from "./Table";
+import { getSwapUrl } from "../utils/getSwapUrl";
+import type { Row } from "../types";
 
 function Dashboard() {
   const { rows, loading } = useRows();
-  const [src, setSrc] = useState('all');
-  const [dst, setDst] = useState('all');
-  const [sym, setSym] = useState('all');
+  const [src, setSrc] = useState("all");
+  const [dst, setDst] = useState("all");
+  const [sym, setSym] = useState("all");
 
   const [baseAsset, setBaseAsset] = useState<Row | null>(null);
-  const [highlightedKey, setHighlightedKey] = useState<string | undefined>(undefined);
+  const [highlightedKey, setHighlightedKey] = useState<string | undefined>(
+    undefined
+  );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const list = useMemo(
     () =>
       rows
         .filter(
-          r =>
-            (src === 'all' || r.source === src) &&
-            (dst === 'all' || r.dest === dst) &&
-            (sym === 'all' || r.symbol === sym),
+          (r) =>
+            (src === "all" || r.source === src) &&
+            (dst === "all" || r.dest === dst) &&
+            (sym === "all" || r.symbol === sym)
         )
         .sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)), // Sort by TVL descending
-    [rows, src, dst, sym],
+    [rows, src, dst, sym]
   );
 
   // Compute filtered total TVL (sum of valueUsd for filtered rows)
   const filteredTotal = useMemo(
     () =>
-      list.reduce((sum, r) => sum + (typeof r.valueUsd === 'number' ? r.valueUsd : 0), 0),
-    [list],
+      list.reduce(
+        (sum, r) =>
+          sum +
+          (typeof r.valueUsd === "number" && !isNaN(r.valueUsd)
+            ? r.valueUsd
+            : 0),
+        0
+      ),
+    [list]
   );
 
   function handleRowClick(row: Row) {
@@ -47,7 +56,7 @@ function Dashboard() {
     } else {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       const url = getSwapUrl(baseAsset, row);
-      window.open(url, '_blank');
+      window.open(url, "_blank");
       setBaseAsset(null);
       setHighlightedKey(undefined);
     }
@@ -63,15 +72,16 @@ function Dashboard() {
           <span
             className="inline-block animate-spin mr-2 align-middle"
             style={{
-              width: '1.5rem',
-              height: '1.5rem',
-              border: '2px solid #32E685',
-              borderTop: '4px solid transparent',
-              borderRadius: '50%',
+              width: "1.5rem",
+              height: "1.5rem",
+              border: "2px solid #32E685",
+              borderTop: "4px solid transparent",
+              borderRadius: "50%",
             }}
           ></span>
         ) : (
-          '$' + filteredTotal.toLocaleString(undefined, {
+          "$" +
+          filteredTotal.toLocaleString(undefined, {
             maximumFractionDigits: 2,
           })
         )}
@@ -83,19 +93,19 @@ function Dashboard() {
           label="Source"
           value={src}
           onChange={setSrc}
-          opts={['all', ...new Set(rows.map(r => r.source))]}
+          opts={["all", ...new Set(rows.map((r) => r.source))]}
         />
         <Filters
           label="Destination"
           value={dst}
           onChange={setDst}
-          opts={['all', ...new Set(rows.map(r => r.dest))]}
+          opts={["all", ...new Set(rows.map((r) => r.dest))]}
         />
         <Filters
           label="Symbol"
           value={sym}
           onChange={setSym}
-          opts={['all', ...new Set(rows.map(r => r.symbol))]}
+          opts={["all", ...new Set(rows.map((r) => r.symbol))]}
         />
       </div>
       <div className="w-full overflow-x-auto">
