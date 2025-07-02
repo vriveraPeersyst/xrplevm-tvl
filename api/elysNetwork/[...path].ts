@@ -1,24 +1,33 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { URLSearchParams } from 'url';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { path = [] } = req.query;
-  const url = `http://api.elys.network/${Array.isArray(path) ? path.join('/') : path}${req.url?.split('?')[1] ? '?' + req.url?.split('?')[1] : ''}`;
+  const { path = [], ...query } = req.query as Record<string, any>;
+  const qs = new URLSearchParams();
+  for (const [key, val] of Object.entries(query)) {
+    if (Array.isArray(val)) {
+      val.forEach(v => qs.append(key, v));
+    } else if (val != null) {
+      qs.append(key, String(val));
+    }
+  }
+  const upstreamPath = Array.isArray(path) ? path.join('/') : String(path);
+  const upstreamUrl = `http://api.elys.network/${upstreamPath}${qs.toString() ? `?${qs}` : ''}`;
 
-  const upstreamRes = await fetch(url, {
+  const upstreamRes = await fetch(upstreamUrl, {
     method: req.method,
     headers: {
       ...Object.fromEntries(Object.entries(req.headers)),
       host: 'api.elys.network',
     },
   });
-
   const body = await upstreamRes.arrayBuffer();
+
   res.status(upstreamRes.status);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  upstreamRes.headers.forEach((value, key) => {
-    if (key.toLowerCase() !== 'content-encoding' && key.toLowerCase() !== 'content-length') {
-      res.setHeader(key, value);
-    }
-  });
+  for (const [k, v] of upstreamRes.headers) {
+    if (k.toLowerCase() === 'content-encoding' || k.toLowerCase() === 'content-length') continue;
+    res.setHeader(k, v);
+  }
   res.send(Buffer.from(body));
 }
