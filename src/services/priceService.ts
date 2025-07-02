@@ -1,3 +1,5 @@
+import { isBrowser } from '../utils/isBrowser';
+
 const CACHE_KEY = "price-cache";
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -8,6 +10,7 @@ interface CacheEntry {
 type Cache = Record<string, CacheEntry>;
 
 function loadCache(): Cache {
+  if (!isBrowser) return {};
   try {
     return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
   } catch {
@@ -15,6 +18,7 @@ function loadCache(): Cache {
   }
 }
 function saveCache(c: Cache) {
+  if (!isBrowser) return;
   localStorage.setItem(CACHE_KEY, JSON.stringify(c));
 }
 
@@ -27,9 +31,11 @@ const CG_RATE_LIMIT_KEY = "cg-rate-limit";
 const CG_RATE_LIMIT_TTL = 2 * 60 * 1000; // 2 minutes
 
 function setCGRatelimit() {
+  if (!isBrowser) return;
   localStorage.setItem(CG_RATE_LIMIT_KEY, Date.now().toString());
 }
 function isCGRatelimited(): boolean {
+  if (!isBrowser) return false;
   const ts = Number(localStorage.getItem(CG_RATE_LIMIT_KEY) || "0");
   return !!ts && Date.now() - ts < CG_RATE_LIMIT_TTL;
 }

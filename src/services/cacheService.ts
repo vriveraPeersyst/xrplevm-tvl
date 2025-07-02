@@ -1,3 +1,5 @@
+import { isBrowser } from '../utils/isBrowser';
+
 export class LocalStorageCacheService {
   private cacheKey: string;
   private cacheDuration: number;
@@ -8,6 +10,7 @@ export class LocalStorageCacheService {
   }
 
   get<T>(): T | null {
+    if (!isBrowser) return null;
     const item = localStorage.getItem(this.cacheKey);
     if (!item) return null;
     const parsed = JSON.parse(item);
@@ -22,6 +25,7 @@ export class LocalStorageCacheService {
   }
 
   set<T>(value: T): void {
+    if (!isBrowser) return;
     localStorage.setItem(
       this.cacheKey,
       JSON.stringify({
