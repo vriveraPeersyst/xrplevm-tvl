@@ -4,7 +4,7 @@ export const CHAINS = [
     key: 'elys',
     name: 'Elys Network',
     denom: 'ibc/8464A63954C0350A26C8588E20719F3A0AC8705E4CA0F7450B60C3F16B2D3421',
-    endpoint: 'http://api.elys.network',
+    endpoint: 'https://api.elys.network',
     logo: '/chains/elys.svg',
   },
   {
