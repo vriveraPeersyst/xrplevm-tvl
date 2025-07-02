@@ -17,7 +17,7 @@ export class CoingeckoService {
     try {
       const ids = cgIds.join(",");
       const res = await fetch(
-        `/api/coingecko/api/v3/simple/price?ids=${ids}&vs_currencies=usd`
+        `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`
       );
       if (res.status === 429) {
         // eslint-disable-next-line no-console
