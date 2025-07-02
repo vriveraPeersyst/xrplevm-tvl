@@ -101,7 +101,7 @@ export const ASSETS = [
     binance: "USDCUSDT",
     image: "usdc.png",
   },
-  //{ key:'elys',      symbol:'ELYS', decimals:6,  source:'Elys Network', dest:'XRPL EVM', address:'0x55A7Fc91A3Bf505b0136d84A21A875ABD1987D0e', cg:'elys-token', binance:'', image: 'elys.png' },
+  { key:'elys',      symbol:'ELYS', decimals:6,  source:'Elys Network', dest:'XRPL EVM', address:'0x55A7Fc91A3Bf505b0136d84A21A875ABD1987D0e', cg:'elys-network', binance:'', image: 'elys.png' },
   {
     key: "inj",
     symbol: "INJ",
