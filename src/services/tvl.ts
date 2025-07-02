@@ -1,6 +1,5 @@
 import { ASSETS } from "../config/assets";
 import { CHAINS } from "../config/chains";
-import { getPrice, loadPrices } from "./priceService";
 import type { Row, Destination } from "../types";
 
 const API_EXPLORER = "https://explorer.xrplevm.org/api/v2/tokens";

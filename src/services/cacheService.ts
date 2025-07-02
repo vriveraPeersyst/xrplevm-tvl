@@ -1,5 +1,11 @@
 export class LocalStorageCacheService {
-  constructor(private cacheKey: string, private cacheDuration: number) {}
+  private cacheKey: string;
+  private cacheDuration: number;
+
+  constructor(cacheKey: string, cacheDuration: number) {
+    this.cacheKey = cacheKey;
+    this.cacheDuration = cacheDuration;
+  }
 
   get<T>(): T | null {
     const item = localStorage.getItem(this.cacheKey);
