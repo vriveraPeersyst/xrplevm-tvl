@@ -14,7 +14,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/xrplEvm/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -25,7 +25,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/elysNetwork/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -36,7 +36,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/injective/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -47,7 +47,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/osmosis/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -58,7 +58,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/cosmosHub/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -69,7 +69,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/noble/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -80,7 +80,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/coingecko/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
@@ -91,7 +91,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api\/binance/, ''),
         configure: (proxy) => {
           proxy.on('proxyRes', (proxyRes) => {
-            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://d4a6-2-155-188-113.ngrok-free.app';
+            proxyRes.headers['Access-Control-Allow-Origin'] = 'https://xrplevm-tvl-puce.vercel.app/';
           });
         },
       },
