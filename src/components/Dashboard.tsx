@@ -18,10 +18,27 @@ function Dashboard() {
     undefined
   );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [showMemes, setShowMemes] = useState(false);
+
+  // Persist showMemes and showNFTs in localStorage
+  function getPersistedBool(key: string, defaultValue = false) {
+    if (typeof window === 'undefined') return defaultValue;
+    const v = localStorage.getItem(key);
+    return v === 'true' ? true : defaultValue;
+  }
+  const [showMemes, setShowMemes] = useState(() => getPersistedBool('showMemes', false));
   const { memes, loading: memesLoading } = useMemeTokens(showMemes);
-  const [showNFTs, setShowNFTs] = useState(false);
+  const [showNFTs, setShowNFTs] = useState(() => getPersistedBool('showNFTs', false));
   const { nfts, loading: nftsLoading } = useNFTCollections(showNFTs);
+
+  // Sync to localStorage on change
+  function handleSetShowMemes(val: boolean) {
+    setShowMemes(val);
+    if (typeof window !== 'undefined') localStorage.setItem('showMemes', val ? 'true' : 'false');
+  }
+  function handleSetShowNFTs(val: boolean) {
+    setShowNFTs(val);
+    if (typeof window !== 'undefined') localStorage.setItem('showNFTs', val ? 'true' : 'false');
+  }
 
   const list = useMemo(
     () =>
@@ -217,7 +234,7 @@ function Dashboard() {
             <input
               type="checkbox"
               checked={showMemes}
-              onChange={(e) => setShowMemes(e.target.checked)}
+              onChange={(e) => handleSetShowMemes(e.target.checked)}
               className="appearance-none w-5 h-5 rounded border-2 border-lightPurple bg-black checked:bg-gradient-to-br checked:from-green checked:to-lightPurple focus:ring-0 focus:outline-none transition-all duration-200 peer"
             />
             {/* Custom checkmark icon absolutely centered in the box */}
@@ -234,7 +251,7 @@ function Dashboard() {
             <input
               type="checkbox"
               checked={showNFTs}
-              onChange={(e) => setShowNFTs(e.target.checked)}
+              onChange={(e) => handleSetShowNFTs(e.target.checked)}
               className="appearance-none w-5 h-5 rounded border-2 border-lightPurple bg-black checked:bg-gradient-to-br checked:from-green checked:to-lightPurple focus:ring-0 focus:outline-none transition-all duration-200 peer"
             />
             {/* Custom checkmark icon absolutely centered in the box */}
