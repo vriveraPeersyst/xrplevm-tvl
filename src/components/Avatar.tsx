@@ -1,4 +1,4 @@
-export const Avatar = ({ src, size = 32 }: { src: string, size?: number }) => {
+export const Avatar = ({ src, size = 32, isNFT = false }: { src: string, size?: number, isNFT?: boolean }) => {
   // Use a square flex container with center alignment and no margin collapse
   return (
     <span
@@ -29,16 +29,17 @@ export const Avatar = ({ src, size = 32 }: { src: string, size?: number }) => {
             maxHeight: "100%",
             verticalAlign: "middle",
             margin: 0,
-            padding: 0
+            padding: 0,
+            borderRadius: isNFT ? 8 : "50%"
           }}
-          className="rounded-full"
+          className={isNFT ? "" : "rounded-full"}
         />
       ) : (
         <span
           style={{
             width: size,
             height: size,
-            borderRadius: "50%",
+            borderRadius: isNFT ? 8 : "50%",
             background: "#e2e8f0",
             display: "block"
           }}

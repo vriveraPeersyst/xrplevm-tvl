@@ -73,7 +73,12 @@ export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps)
               }
             }}
           >
-            <td className="py-3 px-8 text-center align-middle"><Avatar src={r.logo} /></td>
+            <td className="py-3 px-8 text-center align-middle">
+              <Avatar 
+                src={r.logo} 
+                isNFT={(!('decimals' in r) || r.decimals === undefined || r.decimals === 0)}
+              />
+            </td>
             <td className="py-3 px-6 font-semibold align-middle">{r.symbol}</td>
             <td className="py-3 px-2 align-middle">{
               r.symbol === 'XRP' && [
