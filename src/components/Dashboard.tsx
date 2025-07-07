@@ -4,6 +4,7 @@ import { Filters } from "./Filters";
 import { Table } from "./Table";
 import { getSwapUrl } from "../utils/getSwapUrl";
 import type { Row } from "../types";
+import { useMemeTokens } from "../hooks/useMemeTokens";
 
 function Dashboard() {
   const { rows, loading } = useRows();
@@ -16,6 +17,8 @@ function Dashboard() {
     undefined
   );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [showMemes, setShowMemes] = useState(false);
+  const { memes, loading: memesLoading } = useMemeTokens(showMemes);
 
   const list = useMemo(
     () =>
@@ -30,10 +33,83 @@ function Dashboard() {
     [rows, src, dst, sym]
   );
 
+  // Merge meme tokens into the list if showMemes is true
+  const combinedList = useMemo(() => {
+    let base = list;
+    if (showMemes && memes.length > 0) {
+      // Convert meme tokens to Row type (minimal for now)
+      const memeRows: Row[] = memes.map((m) => {
+        // Use totalSupply and decimals from meme API if available
+        let normalizedQuantity = 0;
+        let normalizedDecimals = 18;
+        if (m.totalSupply && m.decimals !== undefined) {
+          try {
+            normalizedQuantity = Number(m.totalSupply) / Math.pow(10, m.decimals);
+            normalizedDecimals = m.decimals;
+          } catch {
+            normalizedQuantity = 0;
+            normalizedDecimals = 18;
+          }
+        }
+        return {
+          key: m.address,
+          symbol: m.symbol,
+          name: m.name,
+          logo: m.logo,
+          chainLogo: "", // No chain logo for memes
+          quantity: normalizedQuantity, // Use normalized totalSupply as quantity
+          decimals: normalizedDecimals, // Use decimals from explorer
+          cg: "", // No Coingecko id
+          binance: "", // No Binance symbol
+          source: "XRPL EVM" as any, // Set to XRPL EVM
+          dest: "XRPL EVM" as any,   // Set to XRPL EVM
+          // Use priceUsd as string to preserve all decimals, but parse as number for Row type
+          priceUsd: m.priceUsd ? Number(m.priceUsd) : 0,
+          valueUsd: Number(m.marketCap),
+        };
+      });
+      // Avoid duplicates by address
+      const existingKeys = new Set(base.map((r) => r.key));
+      base = [...base, ...memeRows.filter((r) => !existingKeys.has(r.key))];
+    }
+    // Sort by TVL descending after merging
+    return base.sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0));
+  }, [list, showMemes, memes]);
+
+  // Build filter options including memes if present
+  const allSources = useMemo(() => {
+    const baseSources = new Set(rows.map((r) => r.source));
+    if (showMemes && memes.length > 0) baseSources.add("Memes" as any);
+    return ["all", ...Array.from(baseSources)];
+  }, [rows, showMemes, memes]);
+  const allDests = useMemo(() => {
+    const baseDests = new Set(rows.map((r) => r.dest));
+    if (showMemes && memes.length > 0) baseDests.add("-" as any);
+    return ["all", ...Array.from(baseDests)];
+  }, [rows, showMemes, memes]);
+  const allSymbols = useMemo(() => {
+    const baseSymbols = new Set(rows.map((r) => r.symbol));
+    if (showMemes && memes.length > 0)
+      memes.forEach((m) => baseSymbols.add(m.symbol));
+    return ["all", ...Array.from(baseSymbols)];
+  }, [rows, showMemes, memes]);
+
+  // Use filter values to filter combinedList
+  const filteredList = useMemo(
+    () =>
+      combinedList.filter(
+        (r) =>
+          (src === "all" || r.source === src) &&
+          (dst === "all" || r.dest === dst) &&
+          (sym === "all" || r.symbol === sym)
+      ),
+    [combinedList, src, dst, sym]
+  );
+
   // Compute filtered total TVL (sum of valueUsd for filtered rows)
   const filteredTotal = useMemo(
     () =>
-      list.reduce(
+      filteredList.reduce(
         (sum, r) =>
           sum +
           (typeof r.valueUsd === "number" && !isNaN(r.valueUsd)
@@ -41,7 +117,7 @@ function Dashboard() {
             : 0),
         0
       ),
-    [list]
+    [filteredList]
   );
 
   function handleRowClick(row: Row) {
@@ -63,7 +139,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-5 font-work text-white px-1 text-base md:text-lg">
+    <div className="max-w-7xl mx-auto py-5 font-work text-white px-1 text-base md:text-lg">
       <h2 className="text-center text-2xl md:text-4xl font-extrabold text-lightPurple mb-8 md:mb-10">
         XRPL EVM ecosystem TVL
       </h2>
@@ -93,26 +169,49 @@ function Dashboard() {
           label="Source"
           value={src}
           onChange={setSrc}
-          opts={["all", ...new Set(rows.map((r) => r.source))]}
+          opts={allSources}
         />
         <Filters
           label="Destination"
           value={dst}
           onChange={setDst}
-          opts={["all", ...new Set(rows.map((r) => r.dest))]}
+          opts={allDests}
         />
         <Filters
           label="Symbol"
           value={sym}
           onChange={setSym}
-          opts={["all", ...new Set(rows.map((r) => r.symbol))]}
+          opts={allSymbols}
         />
       </div>
+      {/* memes checkbox */}
+      <div className="flex items-center gap-4 mb-4">
+        <label className="flex items-center gap-2 cursor-pointer select-none px-4 py-2 rounded-lg bg-darkPurple/80 hover:bg-darkPurple/60 transition-colors border border-lightPurple/30 shadow-sm relative">
+          <span className="relative w-5 h-5 flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={showMemes}
+              onChange={(e) => setShowMemes(e.target.checked)}
+              className="appearance-none w-5 h-5 rounded border-2 border-lightPurple bg-black checked:bg-gradient-to-br checked:from-green checked:to-lightPurple focus:ring-0 focus:outline-none transition-all duration-200 peer"
+            />
+            {/* Custom checkmark icon absolutely centered in the box */}
+            {showMemes && (
+              <svg className="absolute left-0 top-0 w-5 h-5 pointer-events-none" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 9.5L8 13L14 6" stroke="#32E685" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </span>
+          <span className="text-lightPurple font-semibold tracking-wide pl-2">Memes</span>
+        </label>
+        {showMemes && memesLoading && (
+          <span className="text-xs text-gray-400">Loading memes...</span>
+        )}
+      </div>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[350px]">
+        <div className="min-w-[1300px]">
           <Table
-            rows={list}
-            loading={loading}
+            rows={filteredList}
+            loading={loading || memesLoading}
             onRowClick={handleRowClick}
             highlightedKey={highlightedKey}
           />
