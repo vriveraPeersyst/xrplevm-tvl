@@ -67,9 +67,10 @@ export function useNFTCollections(enabled: boolean) {
       return;
     }
     setLoading(true);
-    // Always use the Supabase API directly (no CORS proxy)
+    // Use CORS proxy for Supabase API (works like browser extension or manual fetch)
     const supabaseApi = 'https://lwrrxstrfnvgsreqoujq.supabase.co/functions/v1/collections-api';
-    fetch(supabaseApi)
+    const supabaseUrl = 'https://corsproxy.io/?' + encodeURIComponent(supabaseApi);
+    fetch(supabaseUrl)
       .then(res => res.json())
       .then((fallbackData) => {
         if (!Array.isArray(fallbackData) || fallbackData.length === 0) throw new Error('No NFTs');
