@@ -74,15 +74,17 @@ export function useNFTCollections(enabled: boolean) {
       .then((fallbackData) => {
         if (!Array.isArray(fallbackData) || fallbackData.length === 0) throw new Error('No NFTs');
         const fallbackCollections: NFTCollection[] = fallbackData.map((nft: any) => {
-          let symbol = nft.name;
-          if (/^0x[a-fA-F0-9]{40}$/.test(symbol)) {
-            symbol = symbol.slice(0, 6) + '...' + symbol.slice(-4);
-          }
+          // Parse supply as number, treat '-' or invalid as 0
           let totalSupply = 0;
           if (typeof nft.supply === 'string') {
             totalSupply = Number(nft.supply.replace(/[^\d.]/g, '')) || 0;
           } else if (typeof nft.supply === 'number') {
             totalSupply = nft.supply;
+          }
+          // Use name as symbol, abbreviate if 0x address
+          let symbol = nft.name;
+          if (/^0x[a-fA-F0-9]{40}$/.test(symbol)) {
+            symbol = symbol.slice(0, 6) + '...' + symbol.slice(-4);
           }
           return {
             address: nft.nftAddress,
