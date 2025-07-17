@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { LocalStorageCacheService } from '../services/cacheService';
+import { ASSETS } from '../config/assets';
 
 export interface MemeToken {
   address: string;
@@ -33,42 +34,99 @@ export function useMemeTokens(enabled: boolean) {
       return;
     }
     setLoading(true);
-    fetch("https://corsproxy.io/?https://api.rddl.fun/tokens?paginate=:18:0&sort=marketCap:desc")
-      .then((res) => res.json())
-      .then(async (data) => {
-        const tokens = data.data;
-        // Fetch priceUsd and totalSupply for each token
-        const withDetails = await Promise.all(
-          tokens.map(async (token: any) => {
-            const priceRes = await fetch(
-              `https://corsproxy.io/?https://api.rddl.fun/token?address=${token.address}`
-            );
-            const priceData = await priceRes.json();
-            // Fetch totalSupply from explorer API
-            let totalSupply = undefined;
-            let decimals = 18;
-            try {
-              const explorerRes = await fetch(
-                `https://corsproxy.io/?https://explorer.xrplevm.org/api/v2/tokens/${token.address}`
+    
+    // Fetch both RDDL and XRise33 tokens in parallel
+    Promise.all([
+      // RDDL meme tokens
+      fetch("https://corsproxy.io/?https://api.rddl.fun/tokens?paginate=:18:0&sort=marketCap:desc")
+        .then((res) => res.json())
+        .then(async (data) => {
+          const tokens = data.data;
+          // Fetch priceUsd and totalSupply for each token
+          return await Promise.all(
+            tokens.map(async (token: any) => {
+              const priceRes = await fetch(
+                `https://corsproxy.io/?https://api.rddl.fun/token?address=${token.address}`
               );
-              const explorerData = await explorerRes.json();
-              totalSupply = explorerData.total_supply;
-              // Extract decimals as a number from explorer API (string in response)
-              decimals = explorerData.decimals ? Number(explorerData.decimals) : 18;
-            } catch {}
+              const priceData = await priceRes.json();
+              // Fetch totalSupply from explorer API
+              let totalSupply = undefined;
+              let decimals = 18;
+              try {
+                const explorerRes = await fetch(
+                  `https://corsproxy.io/?https://explorer.xrplevm.org/api/v2/tokens/${token.address}`
+                );
+                const explorerData = await explorerRes.json();
+                totalSupply = explorerData.total_supply;
+                // Extract decimals as a number from explorer API (string in response)
+                decimals = explorerData.decimals ? Number(explorerData.decimals) : 18;
+              } catch {}
+              return {
+                ...token,
+                priceUsd: priceData.priceUsd,
+                totalSupply,
+                decimals,
+              };
+            })
+          );
+        })
+        .catch(() => []),
+      
+      // XRise33 tokens
+      fetch("https://api.xrise33.com/tokens")
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.data || !Array.isArray(data.data)) return [];
+          return data.data.map((token: any) => {
+            // Calculate market cap from totalSupply and usdPerToken
+            const totalSupply = token.totalSupply ? String(token.totalSupply) : "0";
+            const priceUsd = token.usdPerToken ? String(token.usdPerToken) : "0";
+            const marketCap = token.fdv ? String(token.fdv) : "0";
+            
             return {
-              ...token,
-              priceUsd: priceData.priceUsd,
+              address: token.address,
+              symbol: token.symbol,
+              name: token.name,
+              logo: token.image || "/assets/XRPLEVM_FullWhiteLogo.png",
+              marketCap,
+              priceUsd,
+              decimals: token.decimals || 18,
               totalSupply,
-              decimals,
             };
-          })
-        );
-        setMemes(withDetails);
-        memeCache.set(withDetails);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+          });
+        })
+        .catch(() => [])
+    ])
+    .then(([rddlTokens, xriseTokens]) => {
+      // Get addresses of tokens already in main TVL (case-insensitive)
+      const mainTvlAddresses = new Set(
+        ASSETS.map(asset => asset.address.toLowerCase())
+      );
+      
+      // Filter out tokens that are already in main TVL
+      const filteredRddlTokens = rddlTokens.filter((token: any) => 
+        !mainTvlAddresses.has(token.address.toLowerCase())
+      );
+      
+      const filteredXriseTokens = xriseTokens.filter((token: any) => 
+        !mainTvlAddresses.has(token.address.toLowerCase())
+      );
+      
+      // Combine both sources, avoiding duplicates by address
+      const allTokens = [...filteredRddlTokens];
+      const existingAddresses = new Set(filteredRddlTokens.map((t: any) => t.address.toLowerCase()));
+      
+      filteredXriseTokens.forEach((token: any) => {
+        if (!existingAddresses.has(token.address.toLowerCase())) {
+          allTokens.push(token);
+        }
+      });
+      
+      setMemes(allTokens);
+      memeCache.set(allTokens);
+      setLoading(false);
+    })
+    .catch(() => setLoading(false));
   }, [enabled]);
 
   return { memes, loading };
