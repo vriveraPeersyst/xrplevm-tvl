@@ -3,15 +3,9 @@ import { isBrowser } from '../utils/isBrowser';
 const CACHE_KEY = "price-cache";
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-// Always use proxy paths - configured in vite.config.ts (dev) and vercel.json (prod)
-const MIDAS_API_BASE = "/api/midas";
-const COINGECKO_API_BASE = "/api/coingecko";
-const BINANCE_API_BASE = "/api/binance";
-
-interface MidasPricePoint {
-  timestamp: number;
-  price: number;
-}
+// Use direct API URLs
+const COINGECKO_API_BASE = "https://api.coingecko.com";
+const BINANCE_API_BASE = "https://api.binance.com";
 
 interface CacheEntry {
   price: number;
@@ -48,78 +42,6 @@ function isCGRatelimited(): boolean {
   if (!isBrowser) return false;
   const ts = Number(localStorage.getItem(CG_RATE_LIMIT_KEY) || "0");
   return !!ts && Date.now() - ts < CG_RATE_LIMIT_TTL;
-}
-
-// Custom price fetcher for mXRP using Midas API
-// mXRP price is measured in XRP, so we need to multiply by XRP price to get USD value
-async function fetchMidasMXRP(cache: Cache): Promise<number> {
-  try {
-    // eslint-disable-next-line no-console
-    console.log('[priceService] Starting mXRP fetch from Midas API');
-    
-    const now = Math.floor(Date.now() / 1000);
-    const thirtyDaysAgo = now - (30 * 24 * 60 * 60);
-    
-    const midasUrl = `${MIDAS_API_BASE}/mxrp/price?timestampFrom=${thirtyDaysAgo}&timestampTo=${now}&environment=mainnet`;
-    // eslint-disable-next-line no-console
-    console.log('[priceService] Midas API URL:', midasUrl);
-    
-    // Fetch mXRP/XRP ratio from Midas
-    const res = await fetch(midasUrl);
-    
-    if (!res.ok) {
-      // eslint-disable-next-line no-console
-      console.warn('[priceService] Failed to fetch mXRP price from Midas API, status:', res.status);
-      return NaN;
-    }
-    
-    const data: MidasPricePoint[] = await res.json();
-    // eslint-disable-next-line no-console
-    console.log('[priceService] Midas API response:', data);
-    
-    // Get the most recent mXRP/XRP ratio
-    if (!data || data.length === 0) {
-      // eslint-disable-next-line no-console
-      console.warn('[priceService] Midas API returned empty data');
-      return NaN;
-    }
-    
-    const latestRatio = data[data.length - 1].price;
-    // eslint-disable-next-line no-console
-    console.log('[priceService] Latest mXRP/XRP ratio:', latestRatio);
-    
-    // Try to get XRP price from cache first (it's likely already fetched)
-    let xrpPriceUSD = cache["ripple"]?.price;
-    // eslint-disable-next-line no-console
-    console.log('[priceService] XRP price from cache:', xrpPriceUSD);
-    
-    // If not in cache, try fetching from Binance
-    if (!xrpPriceUSD || xrpPriceUSD <= 0) {
-      // eslint-disable-next-line no-console
-      console.log('[priceService] Fetching XRP price from Binance...');
-      xrpPriceUSD = await fetchBinance("XRPUSDT");
-      // eslint-disable-next-line no-console
-      console.log('[priceService] XRP price from Binance:', xrpPriceUSD);
-    }
-    
-    if (isNaN(xrpPriceUSD) || xrpPriceUSD <= 0) {
-      // eslint-disable-next-line no-console
-      console.warn('[priceService] Failed to fetch XRP price for mXRP calculation');
-      return NaN;
-    }
-    
-    // mXRP USD price = (mXRP/XRP ratio) * (XRP/USD price)
-    const mxrpPriceUSD = latestRatio * xrpPriceUSD;
-    
-    // eslint-disable-next-line no-console
-    console.log(`[priceService] ✅ mXRP calculation: ${latestRatio.toFixed(8)} (mXRP/XRP) * $${xrpPriceUSD.toFixed(4)} (XRP/USD) = $${mxrpPriceUSD.toFixed(4)} USD`);
-    
-    return mxrpPriceUSD;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('[priceService] Error fetching mXRP price from Midas:', e);
-    return NaN;
-  }
 }
 
 // Batch fetch Coingecko prices for multiple ids
@@ -250,29 +172,7 @@ export async function getPrices(
     }
   }
 
-  // Fetch mXRP AFTER other prices (especially XRP) are cached
-  // Special handling for mXRP: fetch from Midas API
-  let mxrpPrice: number | undefined;
-  const hasMXRP = idsArr.some((i) => i.cg === "midas-xrp");
-  // eslint-disable-next-line no-console
-  console.log('[priceService] Has mXRP in request?', hasMXRP, 'idsArr:', idsArr.map(i => i.cg));
-  if (hasMXRP) {
-    try {
-      mxrpPrice = await fetchMidasMXRP(cache);
-      if (mxrpPrice !== undefined && !isNaN(mxrpPrice) && mxrpPrice > 0) {
-        cache["midas-xrp"] = { price: mxrpPrice, ts: now };
-        saveCache(cache);
-        // eslint-disable-next-line no-console
-        console.log('[priceService] mXRP price cached successfully:', mxrpPrice);
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn('[priceService] mXRP price fetch returned invalid value:', mxrpPrice);
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn("[priceService] Midas mXRP price fetch failed:", e);
-    }
-  }
+  // mXRP is handled in coingeckoService.ts with XRP price × 1.002
 
   const STABLES = [
     "first-digital-usd", // FDUSD
@@ -295,7 +195,8 @@ export async function getPrices(
     if (ids.cg === "elys-token") {
       price = elysPrice;
     } else if (ids.cg === "midas-xrp") {
-      price = mxrpPrice;
+      // mXRP is handled in coingeckoService, skip here
+      price = undefined;
     } else {
       price = cache[ids.cg]?.price;
       if (!price || price <= 0) {

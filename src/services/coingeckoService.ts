@@ -85,13 +85,13 @@ export class CoingeckoService {
       return NaN;
     }
 
-    // Special handling for mXRP - fetch ratio from Midas API and multiply by XRP price
+    // Special handling for mXRP - fetch from Midas API via serverless proxy, fallback to XRP × 1.002
     if (symbol === "mXRP" || asset.cg === "midas-xrp") {
-      console.log(`[CoingeckoService] Fetching mXRP price using Midas API ratio`);
+      console.log(`[CoingeckoService] Fetching mXRP price`);
       try {
-        // Step 1: Get XRP price first
+        // Step 1: Get XRP price (needed for both approaches)
         const priceIds = [{
-          cg: "ripple", // XRP CoinGecko ID
+          cg: "ripple",
           binance: "XRPUSDT",
         }];
         
@@ -101,45 +101,47 @@ export class CoingeckoService {
         console.log(`[CoingeckoService] XRP price:`, xrpPrice);
         
         if (!xrpPrice || isNaN(xrpPrice) || xrpPrice <= 0) {
-          throw new Error(`Invalid XRP price: ${xrpPrice}`);
+          console.warn(`[CoingeckoService] Invalid XRP price, returning NaN`);
+          return NaN;
         }
         
-        // Step 2: Fetch mXRP/XRP ratio from Midas API
-        const now = Math.floor(Date.now() / 1000);
-        const thirtyDaysAgo = now - (30 * 24 * 60 * 60);
-        const midasUrl = `/api/midas/mxrp/price?timestampFrom=${thirtyDaysAgo}&timestampTo=${now}&environment=mainnet`;
-        
-        console.log(`[CoingeckoService] Fetching Midas ratio from:`, midasUrl);
-        
-        const midasRes = await fetch(midasUrl);
-        
-        if (!midasRes.ok) {
-          console.warn(`[CoingeckoService] Midas API failed (${midasRes.status}), using fallback ratio 1.002`);
-          const mxrpPrice = xrpPrice * 1.002;
-          console.log(`[CoingeckoService] mXRP price (fallback): XRP $${xrpPrice.toFixed(4)} × 1.002 = $${mxrpPrice.toFixed(4)}`);
-          return mxrpPrice;
+        // Step 2: Try to fetch mXRP/XRP ratio from Midas API via serverless proxy
+        let ratio = null;
+        try {
+          const proxyUrl = '/api/midas-proxy';
+          console.log(`[CoingeckoService] Attempting Midas API via proxy: ${proxyUrl}`);
+          
+          const midasResponse = await fetch(proxyUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
+          
+          if (midasResponse.ok) {
+            const midasData = await midasResponse.json();
+            if (midasData.ratio && typeof midasData.ratio === 'number' && midasData.ratio > 0) {
+              ratio = midasData.ratio;
+              console.log(`[CoingeckoService] ✅ Got Midas ratio: ${ratio} (${midasData.dataPoints} data points)`);
+            }
+          } else {
+            console.warn(`[CoingeckoService] Midas proxy returned error: ${midasResponse.status}`);
+          }
+        } catch (midasError) {
+          const errorMsg = midasError instanceof Error ? midasError.message : String(midasError);
+          console.warn('[CoingeckoService] Midas proxy failed, using fallback:', errorMsg);
         }
         
-        const midasData = await midasRes.json();
-        console.log(`[CoingeckoService] Midas response:`, midasData);
+        // Step 3: Calculate mXRP price
+        // Use Midas ratio if available, otherwise fallback to fixed 1.002 multiplier
+        const finalRatio = ratio || 1.002;
+        const mxrpPrice = xrpPrice * finalRatio;
         
-        // Get the latest mXRP/XRP ratio
-        if (!midasData || midasData.length === 0) {
-          console.warn(`[CoingeckoService] Midas returned empty data, using fallback ratio 1.002`);
-          const mxrpPrice = xrpPrice * 1.002;
-          return mxrpPrice;
-        }
-        
-        const latestRatio = midasData[midasData.length - 1].price;
-        console.log(`[CoingeckoService] Latest mXRP/XRP ratio from Midas:`, latestRatio);
-        
-        // Step 3: Calculate mXRP USD price = (mXRP/XRP ratio) × (XRP/USD price)
-        const mxrpPrice = latestRatio * xrpPrice;
-        console.log(`[CoingeckoService] ✅ mXRP price: ${latestRatio.toFixed(6)} (ratio) × $${xrpPrice.toFixed(4)} (XRP) = $${mxrpPrice.toFixed(4)}`);
+        const source = ratio ? 'Midas API' : 'fallback (1.002)';
+        console.log(`[CoingeckoService] ✅ mXRP price: $${xrpPrice.toFixed(4)} × ${finalRatio.toFixed(6)} (${source}) = $${mxrpPrice.toFixed(4)}`);
         
         return mxrpPrice;
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn('[CoingeckoService] Failed to fetch mXRP price:', e);
         return NaN;
       }
