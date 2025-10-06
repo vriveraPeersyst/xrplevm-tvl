@@ -108,7 +108,8 @@ export class CoingeckoService {
         // Step 2: Try to fetch mXRP/XRP ratio from Midas API via serverless proxy
         let ratio = null;
         try {
-          const proxyUrl = '/api/midas-proxy';
+          // Use relative path - Vercel will route /api/* to serverless functions
+          const proxyUrl = `${window.location.origin}/api/midas-proxy`;
           console.log(`[CoingeckoService] Attempting Midas API via proxy: ${proxyUrl}`);
           
           const midasResponse = await fetch(proxyUrl, {
@@ -116,13 +117,20 @@ export class CoingeckoService {
             headers: {
               'Accept': 'application/json',
             },
+            // Add timeout
+            signal: AbortSignal.timeout(10000), // 10 second timeout
           });
           
           if (midasResponse.ok) {
-            const midasData = await midasResponse.json();
-            if (midasData.ratio && typeof midasData.ratio === 'number' && midasData.ratio > 0) {
-              ratio = midasData.ratio;
-              console.log(`[CoingeckoService] ✅ Got Midas ratio: ${ratio} (${midasData.dataPoints} data points)`);
+            const contentType = midasResponse.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              console.warn(`[CoingeckoService] Midas proxy returned non-JSON: ${contentType}`);
+            } else {
+              const midasData = await midasResponse.json();
+              if (midasData.ratio && typeof midasData.ratio === 'number' && midasData.ratio > 0) {
+                ratio = midasData.ratio;
+                console.log(`[CoingeckoService] ✅ Got Midas ratio: ${ratio} (${midasData.dataPoints} data points)`);
+              }
             }
           } else {
             console.warn(`[CoingeckoService] Midas proxy returned error: ${midasResponse.status}`);
