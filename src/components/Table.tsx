@@ -91,7 +91,7 @@ export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps)
             <td className="py-3 px-6 font-mono align-middle">{typeof r.quantity === 'number' && !isNaN(r.quantity) ? r.quantity.toLocaleString(undefined, { maximumFractionDigits: (r.quantity < 1 ? 8 : (r.decimals === 8 ? 8 : 2)) }) : '-'}</td>
             <td className="py-3 px-6 font-mono align-middle">
               {typeof r.priceUsd === 'number' && !isNaN(r.priceUsd) && r.priceUsd > 0
-                ? ('$' + r.priceUsd.toLocaleString(undefined, { maximumFractionDigits: 18 }))
+                ? ('$' + r.priceUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
                 : <span className="text-red-400">N/A</span>
               }
             </td>

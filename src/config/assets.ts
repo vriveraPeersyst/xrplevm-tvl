@@ -1,4 +1,5 @@
-export const ASSETS = [
+// Static assets that are always included
+export const STATIC_ASSETS = [
   // Squid Router
   {
     key: "xrp",
@@ -10,6 +11,16 @@ export const ASSETS = [
     cg: "ripple",
     binance: "XRPUSDT",
     image: "xrp.png",
+  },{
+    key: "mxrp",
+    symbol: "mXRP",
+    decimals: 18,
+    source: "XRPL EVM",
+    dest: "XRPL EVM",
+    address: "0x06e0B0F1A644Bb9881f675Ef266CeC15a63a3d47",
+    cg: "midas-xrp",
+    binance: "XRPUSDT",
+    image: "mxrp.png",
   },
   {
     key: "wbtc",
@@ -165,3 +176,65 @@ export const ASSETS = [
     image: "mtbill.png",
   },
 ];
+
+// Service to fetch approved tokens from submission platform
+export const approvedTokensService = {
+  async getApprovedTokens(): Promise<any[]> {
+    try {
+      const response = await fetch('/api/tokens/approved', {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.warn('Failed to fetch approved tokens:', response.status);
+        return [];
+      }
+      
+      const approvedTokens = await response.json();
+      
+      // Transform approved tokens to match AssetStatic format
+      return approvedTokens.map((token: any) => ({
+        key: token.address?.toLowerCase() || `token-${token.id}`,
+        symbol: token.symbol,
+        decimals: token.decimals || 18,
+        source: token.source || "Ethereum",
+        dest: "XRPL EVM",
+        address: token.address,
+        cg: token.coingeckoId || "",
+        binance: token.binanceSymbol || "",
+        image: token.image || "default-token.png",
+      }));
+    } catch (error) {
+      console.warn('Error fetching approved tokens:', error);
+      return [];
+    }
+  }
+};
+
+// Combined assets function - merges static and approved tokens
+export const getAssets = async () => {
+  try {
+    const approvedTokens = await approvedTokensService.getApprovedTokens();
+    
+    // Filter out any duplicates by address (static assets take precedence)
+    const staticAddresses = new Set(
+      STATIC_ASSETS
+        .filter(asset => asset.address)
+        .map(asset => asset.address.toLowerCase())
+    );
+    
+    const uniqueApprovedTokens = approvedTokens.filter(token => 
+      !staticAddresses.has(token.address?.toLowerCase())
+    );
+    
+    return [...STATIC_ASSETS, ...uniqueApprovedTokens];
+  } catch (error) {
+    console.warn('Error loading combined assets, falling back to static assets:', error);
+    return STATIC_ASSETS;
+  }
+};
+
+// Legacy export for backwards compatibility
+export const ASSETS = STATIC_ASSETS;

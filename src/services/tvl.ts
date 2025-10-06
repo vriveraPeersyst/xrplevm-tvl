@@ -1,4 +1,4 @@
-import { ASSETS } from "../config/assets";
+import { getAssets } from "../config/assets";
 import { CHAINS } from "../config/chains";
 import type { Row, Destination } from "../types";
 
@@ -32,9 +32,12 @@ async function cosmosSupply(endpoint: string, denom: string) {
 export async function loadRows(
   getPrice: (symbol: string) => Promise<number>
 ): Promise<Row[]> {
-  /* 1) ERC-20 + IBC assets on XRPL EVM */
+  /* 1) Get all assets (static + approved) */
+  const assets = await getAssets();
+
+  /* 2) ERC-20 + IBC assets on XRPL EVM */
   const erc = await Promise.all(
-    ASSETS.map(async (a) => {
+    assets.map(async (a) => {
       const raw = a.address ? await peersystSupply(a.address) : "0";
       const usd = await getPrice(a.symbol);
       const q = Number(raw) / 10 ** a.decimals;
