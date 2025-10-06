@@ -17,6 +17,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const queryString = new URLSearchParams(queryParams as Record<string, string>).toString();
   const url = `https://api-prod.midas.app/api/data/${apiPath}${queryString ? '?' + queryString : ''}`;
   
+  console.log('[Midas API] Fetching:', url);
+  
   try {
     const response = await fetch(url, {
       headers: {
