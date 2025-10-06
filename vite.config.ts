@@ -50,7 +50,7 @@ export default defineConfig({
           });
         },
         // Fallback to mock data if submission platform is not available
-        bypass: (req, res, options) => {
+        bypass: (req, res) => {
           if (req.url === '/api/tokens/approved') {
             // Mock approved tokens for development
             if (res) {
