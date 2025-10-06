@@ -141,11 +141,7 @@ export class CoingeckoService {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn('[CoingeckoService] Failed to fetch mXRP price:', e);
-        // Ultimate fallback
-        const fallbackXrpPrice = 2.50;
-        const mxrpPrice = fallbackXrpPrice * 1.002;
-        console.warn(`[CoingeckoService] Using ultimate fallback: $${fallbackXrpPrice} × 1.002 = $${mxrpPrice.toFixed(4)}`);
-        return mxrpPrice;
+        return NaN;
       }
     }
 
