@@ -2,8 +2,11 @@ import { isBrowser } from '../utils/isBrowser';
 
 const CACHE_KEY = "price-cache";
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
-// Use proxy in browser to bypass CORS, direct API on server
-const MIDAS_API_BASE = isBrowser ? "/api/midas" : "https://api-prod.midas.app/api/data";
+
+// Always use proxy paths - configured in vite.config.ts (dev) and vercel.json (prod)
+const MIDAS_API_BASE = "/api/midas";
+const COINGECKO_API_BASE = "/api/coingecko";
+const BINANCE_API_BASE = "/api/binance";
 
 interface MidasPricePoint {
   timestamp: number;
@@ -129,7 +132,7 @@ async function fetchCGs(cgIds: string[]): Promise<Record<string, number>> {
   try {
     const ids = cgIds.join(",");
     const res = await fetch(
-      `/api/coingecko/api/v3/simple/price?ids=${ids}&vs_currencies=usd`
+      `${COINGECKO_API_BASE}/api/v3/simple/price?ids=${ids}&vs_currencies=usd`
     );
     if (res.status === 429) {
       setCGRatelimit();
@@ -155,7 +158,7 @@ async function fetchBinance(binance: string): Promise<number> {
   if (!binance || binance.trim() === "") return NaN;
   try {
     const res = await fetch(
-      `/api/binance/api/v3/ticker/price?symbol=${binance}`
+      `${BINANCE_API_BASE}/api/v3/ticker/price?symbol=${binance}`
     );
     if (!res.ok) {
       if (res.status === 400) {
