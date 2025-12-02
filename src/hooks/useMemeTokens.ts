@@ -111,18 +111,27 @@ export function useMemeTokens(enabled: boolean) {
         .catch(() => []),
     ])
       .then(([rddlTokens, xriseTokens]) => {
+        // Tokens to hide from the list
+        const hiddenTokens = new Set([
+          "0x6a90E3aAB217b732Fa92f1678e41c4d18bcd6eD9".toLowerCase(),
+        ]);
+
         // Get addresses of tokens already in main TVL (case-insensitive)
         const mainTvlAddresses = new Set(
           ASSETS.map((asset) => asset.address.toLowerCase())
         );
 
-        // Filter out tokens that are already in main TVL
+        // Filter out tokens that are already in main TVL or hidden
         const filteredRddlTokens = rddlTokens.filter(
-          (token: any) => !mainTvlAddresses.has(token.address.toLowerCase())
+          (token: any) =>
+            !mainTvlAddresses.has(token.address.toLowerCase()) &&
+            !hiddenTokens.has(token.address.toLowerCase())
         );
 
         const filteredXriseTokens = xriseTokens.filter(
-          (token: any) => !mainTvlAddresses.has(token.address.toLowerCase())
+          (token: any) =>
+            !mainTvlAddresses.has(token.address.toLowerCase()) &&
+            !hiddenTokens.has(token.address.toLowerCase())
         );
 
         // Combine both sources, avoiding duplicates by address
