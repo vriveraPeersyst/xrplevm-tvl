@@ -9,10 +9,10 @@ interface TableProps {
 }
 
 export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps) => (
-  <div className="overflow-x-auto rounded-xl shadow bg-darkPurple/90">
-    <table className="min-w-full">
+  <div className="rounded-xl">
+    <table style={{ minWidth: 'max-content', width: '100%' }}>
       <thead>
-        <tr className="bg-darkPurple/95 text-lightPurple text-lg">
+        <tr className="text-lightPurple text-lg">
           {[
              '',
              'Symbol',
@@ -24,8 +24,8 @@ export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps)
            ].map((h, i) =>
             <th key={h + i} className={
               i === 0
-                ? "py-4 px-2 font-semibold text-center w-12"
-                : "py-4 px-6 font-semibold text-center"
+                ? "py-4 px-2 font-semibold text-center whitespace-nowrap"
+                : "py-4 px-4 font-semibold text-center whitespace-nowrap"
             }>{h}</th>
           )}
         </tr>
@@ -73,29 +73,29 @@ export const Table = ({ rows, loading, onRowClick, highlightedKey }: TableProps)
               }
             }}
           >
-            <td className="py-3 px-8 text-center align-middle">
+            <td className="py-3 px-4 text-center align-middle whitespace-nowrap">
               <Avatar 
                 src={r.logo} 
                 isNFT={(!('decimals' in r) || r.decimals === undefined || r.decimals === 0)}
               />
             </td>
-            <td className="py-3 px-6 font-semibold align-middle">{r.symbol}</td>
-            <td className="py-3 px-2 align-middle">{
+            <td className="py-3 px-4 font-semibold align-middle whitespace-nowrap">{r.symbol}</td>
+            <td className="py-3 px-4 align-middle whitespace-nowrap">{
               r.symbol === 'XRP' && [
                 'cosmosHub', 'osmo', 'atom', 'elys', 'noble', 'injective'
               ].some(chain => r.dest?.toLowerCase().includes(chain))
                 ? 'XRPL EVM'
                 : r.source
             }</td>
-            <td className="py-3 px-2 align-middle">{r.dest}</td>
-            <td className="py-3 px-6 font-mono align-middle">{typeof r.quantity === 'number' && !isNaN(r.quantity) ? r.quantity.toLocaleString(undefined, { maximumFractionDigits: (r.quantity < 1 ? 8 : (r.decimals === 8 ? 8 : 2)) }) : '-'}</td>
-            <td className="py-3 px-6 font-mono align-middle">
+            <td className="py-3 px-4 align-middle whitespace-nowrap">{r.dest}</td>
+            <td className="py-3 px-4 font-mono align-middle whitespace-nowrap">{typeof r.quantity === 'number' && !isNaN(r.quantity) ? r.quantity.toLocaleString(undefined, { maximumFractionDigits: (r.quantity < 1 ? 8 : (r.decimals === 8 ? 8 : 2)) }) : '-'}</td>
+            <td className="py-3 px-4 font-mono align-middle whitespace-nowrap">
               {typeof r.priceUsd === 'number' && !isNaN(r.priceUsd) && r.priceUsd > 0
                 ? ('$' + r.priceUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
                 : <span className="text-red-400">N/A</span>
               }
             </td>
-            <td className="py-3 px-6 font-mono text-green align-middle">
+            <td className="py-3 px-4 font-mono text-green align-middle whitespace-nowrap">
               {typeof r.valueUsd === 'number' && !isNaN(r.valueUsd) && r.valueUsd > 0
                 ? ('$' + r.valueUsd.toLocaleString(undefined, { maximumFractionDigits: (r.valueUsd < 1 ? 8 : (r.decimals === 8 ? 8 : 2)) }))
                 : <span className="text-red-400">N/A</span>

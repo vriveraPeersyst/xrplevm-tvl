@@ -1,15 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-lightPurple: #C890FF;
+  --color-darkPurple: #7919FF;
+  --color-green: #32E685;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --font-family-work: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+}
 
 @layer base {
   html {
     font-family: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+    overflow-x: hidden;
   }
   body {
     background-color: #000;
     color: #fff;
+    overflow-x: hidden;
   }
 }

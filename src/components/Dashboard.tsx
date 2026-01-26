@@ -270,15 +270,13 @@ function Dashboard() {
           <span className="text-xs text-gray-400">Loading NFTs...</span>
         )}
       </div>
-      <div className="w-full overflow-x-auto">
-        <div className="min-w-[1300px]">
-          <Table
-            rows={filteredList}
-            loading={loading || memesLoading || nftsLoading}
-            onRowClick={handleRowClick}
-            highlightedKey={highlightedKey}
-          />
-        </div>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <Table
+          rows={filteredList}
+          loading={loading || memesLoading || nftsLoading}
+          onRowClick={handleRowClick}
+          highlightedKey={highlightedKey}
+        />
       </div>
     </div>
   );
